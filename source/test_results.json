@@ -1,0 +1,98 @@
+[
+ {
+  "id": "A",
+  "name": "cam.pkt fix: perspective target set and eased",
+  "status": "PASS",
+  "detail": "cam.pkt=0.18 cam.pk=0.180 errors=0"
+ },
+ {
+  "id": "2a",
+  "name": "Hero/heavy beat cuts occur on a hitstop tick",
+  "status": "PASS",
+  "detail": "105 cuts total {\"chase\":1,\"launcher\":51,\"plunge\":53}; beat cuts off-hitstop: 0"
+ },
+ {
+  "id": "2b",
+  "name": "Eased cut (decided Oct 5): target set on the cut tick; cam.ang settles on it within 16 ticks",
+  "status": "PASS",
+  "detail": "target set on cut tick: 105/105; ang settled: 105/105, max 16 ticks (dir.tH=12 hero, dir.tL=16 other). Set dir.tH=dir.tL=0 for the instant cut the first draft asked for"
+ },
+ {
+  "id": "2c",
+  "name": "Step per cut is 1 or 2 (45-90 deg)",
+  "status": "PASS",
+  "detail": "0 violations; steps: {\"1\":102,\"2\":3}"
+ },
+ {
+  "id": "3",
+  "name": "Cooldown: none <36 ticks; none <90 unless higher priority",
+  "status": "PASS",
+  "detail": "<36: 0, <90 w/o higher priority: 0"
+ },
+ {
+  "id": "4",
+  "name": "Air lockout: zero cuts while E airborne and not spiked",
+  "status": "WARN",
+  "detail": "literal: 51 cuts in lockout ({\"launcher\":51}). 51 are the launcher cut on the launching hit (<=6 ticks after air start, on hitstop), which spec section 5 explicitly allows; non-launch cuts in air: 0. Code also exempts 'heavy' from the lockout (spec says no beat may cut); soak produced 0 heavy beats so that path is untested"
+ },
+ {
+  "id": "10",
+  "name": "Soak: 5 min bot, no NaN, no stuck latch, sane cut rate",
+  "status": "WARN",
+  "detail": "NaN ticks=0; longest latch=0 ticks; cuts=105 (21.0/min overall, 30.3/min per combo-minute, combo time 69%); by beat {\"chase\":1,\"launcher\":51,\"plunge\":53}; page errors=0"
+ },
+ {
+  "id": "6",
+  "name": "Readability: non-forced cuts gain >=0.25; forced cuts land >=0.6 (500 placements)",
+  "status": "PASS",
+  "detail": "non-forced: 300 trials, 83 cut, violations 0, min gain 0.26; forced: 200 trials, 195 cut, violations 0, min q 0.61"
+ },
+ {
+  "id": "5",
+  "name": "Input latch: heading unchanged across cuts until release",
+  "status": "PASS",
+  "detail": "{\"latchActive\":true,\"maxDev\":0,\"camAfter\":90,\"keptAng\":true,\"dev2\":0,\"releasedOnLetGo\":true,\"followsNewCam\":true,\"w0\":0,\"w1\":-135,\"releasedOnTurn\":true}"
+ },
+ {
+  "id": "7a",
+  "name": "Baseline: a plunge beat cuts promptly with Auto on (control for 7/8)",
+  "status": "PASS",
+  "detail": "first cut at +1 ticks"
+ },
+ {
+  "id": "7b",
+  "name": "Override: after Q/E no auto-cut for 240 ticks, then a further 60",
+  "status": "WARN",
+  "detail": "first auto-cut at +300 ticks after rotate (spec: must be after 300; ticks 1-300 forbidden)"
+ },
+ {
+  "id": "7c",
+  "name": "Override cancels any queued beat",
+  "status": "PASS",
+  "detail": "dir.q after rotate = null"
+ },
+ {
+  "id": "8",
+  "name": "Slow motion: no cuts at opt.speed 0.5",
+  "status": "PASS",
+  "detail": "0 cuts in 300 ticks"
+ },
+ {
+  "id": "8",
+  "name": "Slow motion: no cuts at opt.speed 0.25",
+  "status": "PASS",
+  "detail": "0 cuts in 300 ticks"
+ },
+ {
+  "id": "9",
+  "name": "Reduced motion: Auto defaults off, no flash, zoom kick halved",
+  "status": "PASS",
+  "detail": "RM=true autoDefault=false flash=0 (normal 8) zoomKick=1.5 (normal 3)"
+ },
+ {
+  "id": "11",
+  "name": "Cost: directorTick under 0.2 ms",
+  "status": "PASS",
+  "detail": "0.0081 ms per call (headless, software rendering irrelevant here)"
+ }
+]

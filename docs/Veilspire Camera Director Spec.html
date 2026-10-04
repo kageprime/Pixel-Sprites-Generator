@@ -1,7 +1,7 @@
 <!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}</style><style>:root{color-scheme:light dark;--md-bg:#fff;--md-text:rgba(0,0,0,.8);--md-muted:rgba(0,0,0,.6);--md-fill:rgba(0,0,0,.04);--md-fill-strong:rgba(0,0,0,.06);--md-rule:rgba(0,0,0,.1);--md-rule-strong:rgba(0,0,0,.16);--md-link:hsl(210 100% 45%)}@media (prefers-color-scheme:dark){:root:where(:not([data-theme="light"])){--md-bg:#0d0d0d;--md-text:rgba(255,255,255,.85);--md-muted:rgba(255,255,255,.6);--md-fill:rgba(255,255,255,.06);--md-fill-strong:rgba(255,255,255,.09);--md-rule:rgba(255,255,255,.14);--md-rule-strong:rgba(255,255,255,.22);--md-link:hsl(210 100% 72%)}}:root[data-theme="dark"]{color-scheme:dark;--md-bg:#0d0d0d;--md-text:rgba(255,255,255,.85);--md-muted:rgba(255,255,255,.6);--md-fill:rgba(255,255,255,.06);--md-fill-strong:rgba(255,255,255,.09);--md-rule:rgba(255,255,255,.14);--md-rule-strong:rgba(255,255,255,.22);--md-link:hsl(210 100% 72%)}:root[data-theme="light"]{color-scheme:light}@media print{:root,:root[data-theme="dark"]{color-scheme:light;--md-bg:#fff;--md-text:rgba(0,0,0,.8);--md-muted:rgba(0,0,0,.6);--md-fill:rgba(0,0,0,.04);--md-fill-strong:rgba(0,0,0,.06);--md-rule:rgba(0,0,0,.1);--md-rule-strong:rgba(0,0,0,.16);--md-link:hsl(210 100% 45%)}}body{background:var(--md-bg);color:var(--md-text);max-width:720px;margin:0 auto;padding:32px;display:flex;flex-direction:column;gap:10px;font:14px/1.55 -apple-system,BlinkMacSystemFont,'SF Pro','Segoe UI',sans-serif;overflow-wrap:break-word}body>:first-child{margin-top:0}h1,h2,h3,h4,h5,h6{margin:6px 0 0;line-height:1.25;font-weight:600;text-wrap:balance}h1{font-size:1.35em}h2{font-size:1.15em;color:var(--md-muted)}h3,h4,h5,h6{font-size:1em}p,ul,ol,blockquote,table,pre,hr{margin:0}strong{font-weight:600}a{color:var(--md-link);text-decoration:none}a:hover{text-decoration:underline}ul,ol{display:flex;flex-direction:column;gap:6px;padding-left:22px}ul{list-style:disc}ol{list-style:decimal}:is(li,td,th)>*+:is(p,ul,ol,blockquote){margin-top:6px}blockquote{display:flex;flex-direction:column;gap:10px;border-left:2px solid var(--md-rule);padding-left:10px;color:var(--md-muted)}:not(pre)>code{background:var(--md-fill);padding:1px 3px;border-radius:4px;font:.92em 'SF Mono',ui-monospace,Menlo,Consolas,monospace}a>code{background:none;color:inherit}pre{background:var(--md-fill);padding:10px 12px;border-radius:6px;overflow-x:auto;font:12px/1.5 'SF Mono',ui-monospace,Menlo,Consolas,monospace;margin-block:4px}pre code{background:none;padding:0;font:inherit}table{width:100%;border-collapse:separate;border-spacing:2px;font:inherit}th,td{padding:6px 8px;border-radius:3px;text-align:left;vertical-align:top}th{background:var(--md-fill-strong);font-weight:600}td{background:var(--md-fill)}:is(th,td) :not(pre)>code{background:transparent}hr{border:0;border-top:1px solid var(--md-rule-strong);margin-block:10px}img{max-width:100%;height:auto;border-radius:4px}</style>
 </head><body>
 <h1>Veilspire Camera Director Spec</h1>
-<p>Oct 4, 2026 · @kage · Status: draft for review</p>
+<p>Oct 4, 2026 · @kage · Updated Oct 5, 2026 to match the shipped build · Status: built, tuning and open items in section 10</p>
 <h2>1. Goal and scope</h2>
 <p>Build an <strong>Auto camera</strong> for <code>combat.html</code> that cuts between the eight 45° view angles on combat beats, so fights feel directed, while controls stay predictable and the player can switch it off.</p>
 <p>The feel we are chasing: the snap into a new angle at the moment of impact, the way fighting games cut on launches and finishers. Everything else in this spec exists to make that snap safe: it must never hide the fight, steal the player's input, or make anyone sick.</p>
@@ -12,13 +12,13 @@
 <li>A readability check so a cut never hides the fight.</li>
 <li>An input latch so a cut never changes where the player is heading mid-run.</li>
 <li>An Auto/Manual setting, a manual override, and a debug overlay.</li>
+<li>Added after the first draft: short hero-shot pitch changes, an optional Immersive chase camera, and all twelve fighters (section 3).</li>
 </ul>
 <p><strong>Out of scope for this pass</strong></p>
 <ul>
 <li>Free-look or camera angles other than the eight 45° steps (the sprites only exist for eight facings).</li>
-<li>Pitch or height changes. The projection is fixed 2:1 isometric, so a &quot;low angle&quot; shot is not available; a shot differs only by angle, zoom kick, focus and timing.</li>
+<li>Free pitch or height control. Pitch changes only in the fixed steps in section 3 (Immersive base view and the hero shot), using pre-rendered sprite sets.</li>
 <li>Bespoke per-attack cinematics and finisher cutscenes (later phase, section 11).</li>
-<li>Characters other than Bram and Cinder, until the others are wired into the page.</li>
 </ul>
 <h2>2. Research summary and what it changed</h2>
 <table>
@@ -56,20 +56,26 @@
 </tbody>
 </table>
 <p>Sources are linked in section 12.</p>
-<h2>3. What the code does today (constraints)</h2>
-<p>Found in <code>source/combat.src.html</code>. These shape the design:</p>
-<ol>
-<li><strong>Rotation is an ease, not a cut.</strong> <code>rotate(d)</code> adds 45 to <code>cam.target</code>; <code>updateCam()</code> eases <code>cam.ang</code> toward it at rate 9. <code>cam.target</code> is never wrapped, so it grows without bound.</li>
-<li><strong>Input follows the animated angle.</strong> <code>worldMove()</code> maps screen input through <code>cam.ang</code>, so holding a direction during an ease already curves the path. This exists today with Q/E.</li>
-<li><strong>Sprite rows follow the animated angle.</strong> <code>rowOf(face)</code> uses <code>cam.ang</code>, so during an ease the sprite facing steps through intermediate rows. An instant cut avoids that.</li>
-<li><strong><code>updateCam()</code> runs before the hitstop early-return in <code>simTick()</code>.</strong> Camera work continues during hitstop while the sim is frozen. A cut on a hitstop frame is the cleanest cut we can make: nothing moves, input is not consumed, and the player sees the impact pose from the new angle.</li>
-<li><strong>Beat hooks already exist.</strong> <code>hurt()</code> (kinds <code>light</code>, <code>heavy</code>, <code>launch</code>, <code>air</code>, <code>spike</code>) and <code>enemyLand()</code> (which knows <code>spiked</code> and impact speed) already fire shake, push-in, focus kick and hitstop. The director hooks the same places.</li>
-<li><strong>Focus ignores height.</strong> <code>updateCam()</code> follows the midpoint of the fighters in x/y only; a launched dummy can leave the frame's centre.</li>
-<li><strong>Braziers sit at the four arena corners</strong> (<code>BRAZ</code>, tile coords ±4.05) and are depth-sorted into the scene, so a brazier in front of a fighter can cover them.</li>
-<li><strong>Slow motion</strong> is <code>opt.speed</code> scaling the tick accumulator. Using tick counts (not wall-clock) for all director timers keeps them correct in slow motion.</li>
-<li><strong>Small bug to fix on the way:</strong> the debug line prints <code>cam.target%360</code>, which can go negative.</li>
-<li><strong>Build note:</strong> <code>build.py</code> reads <code>combat.src.html</code> and <code>veilspire_iso/</code> from the current directory and writes <code>out/combat.html</code>. In the zip they are one level apart, so run it from a folder that has both (or adjust the paths). Edit only the source file; the root <code>combat.html</code> is a build output.</li>
-</ol>
+<h2>3. What the code does (as built)</h2>
+<p>Found in <code>source/combat.src.html</code> (Oct 5, 2026). The first draft of this section described the page before the director existed; it now describes the shipped code.</p>
+<ul>
+<li><strong>Manual rotation is an ease.</strong> <code>rotate(d)</code> adds 45 to <code>cam.target</code>; <code>updateCam()</code> eases <code>cam.ang</code> toward it at rate 9. It also latches input (section 7) and starts the Auto pause (section 8). <code>cam.target</code> is only re-wrapped when a cut pushes it past ±360.</li>
+<li><strong>Auto cuts set the target at once and ease the angle briefly.</strong> <code>cutTo()</code> sets <code>cam.target</code> immediately, then tweens <code>cam.ang</code> over <code>dir.tH</code> = 12 ticks (hero beats) or <code>dir.tL</code> = 16 ticks (everything else). Eased cuts are the decided behaviour (section 4); setting both to 0 gives the instant cut the first draft asked for.</li>
+<li><strong>Input follows the latch, not the animated angle.</strong> <code>latchNow()</code> and <code>worldMove()</code> implement section 7, so the heading survives both manual turns and cuts. The bot demo returns world-space movement and bypasses the latch.</li>
+<li><strong>Sprite rows follow the animated angle.</strong> <code>rowOf(face)</code> uses <code>cam.ang</code>, so during a tween the facing steps through intermediate rows. This is the accepted cost of the short ease.</li>
+<li><strong>Director placement.</strong> <code>directorTick()</code> runs right after <code>updateCam()</code> in <code>simTick()</code>, before the hitstop early-return, so a cut on a hitstop frame lands while nothing moves.</li>
+<li><strong>Beat hooks.</strong> <code>hurt()</code> queues <code>launcher</code> (kind <code>launch</code>, target was grounded) and <code>heavy</code>. <code>enemyLand()</code> queues <code>plunge</code> (spiked) and <code>knock</code> (impact speed over 420).</li>
+<li><strong>Hero shot.</strong> A hero cut starts a 70-tick shot: base pitch drops from 0.46 (0.5 with Immersive off) to 0.33 (the <code>p16</code> sprite set) and the perspective target rises from 0.18 to 0.26. A plunge also draws a 54-tick letterbox. Zoom kick is 3 for hero cuts and 1.8 otherwise.</li>
+<li><strong>Immersive mode</strong> (<code>opt.immersive</code>, default on). Base pitch 0.46 with perspective 0.18, and a chase-cam weight <code>cam.ch</code> that eases toward 1 while Auto is on, not paused, and the fight is calm. It adds the <code>chase</code> beat (section 5) and turns off the neutral correction.</li>
+<li><strong>Pitch sprite sets.</strong> <code>cam.pv</code> picks the sprite set from the target pitch: <code>p16/</code> below 21.3°, <code>p38/</code> above 32.3°, the base set in between. The build bakes all three for each sheet.</li>
+<li><strong>Focus follows height.</strong> <code>cam.fz</code> rises with the juggled dummy, so launches stay in frame. (The first draft listed this as a gap.)</li>
+<li><strong>Screen size.</strong> The stage fills the browser window at 16:9 (never under 640 px wide) instead of the old 1100 px box; the canvas stays 640×360 and is scaled up. The HUD, rotate buttons and dock scale with it through <code>--s</code> (set in <code>fit()</code>, 1× to 2.2×). Phones keep the 480×430 layout, chosen from the window width.</li>
+<li><strong>Characters.</strong> All twelve fighters are wired in through the Fighters screen (<code>?p1=</code> and <code>?p2=</code> also work). Sprites are quantised to 256 colours at build time.</li>
+<li><strong>Braziers</strong> still sit at the four arena corners and are depth-sorted into the scene.</li>
+<li><strong>Slow motion</strong> is <code>opt.speed</code> scaling the tick accumulator. All director timers count ticks, so they stay correct.</li>
+<li><strong>The debug print</strong> now uses <code>wrap(cam.target)</code>; the negative-modulo bug is gone.</li>
+<li><strong>Build.</strong> Run <code>python3 build.py</code> from inside <code>source/</code>; it reads <code>combat.src.html</code> and <code>../veilspire_iso</code> and writes <code>out/combat.html</code>. The root <code>combat.html</code> is a copy of that output. Edit only the source file.</li>
+</ul>
 <h2>4. Design overview</h2>
 <p>One question drives every decision: <strong>from which of the eight angles can the player see the fight best, and is this a moment worth cutting on?</strong></p>
 <pre><code>beat fires (hurt / enemyLand)  ──►  queue beat (expires in 6 ticks)
@@ -78,12 +84,12 @@ directorTick()  (every tick, right after updateCam, before the hitstop return)
    ├─ gates: Auto on? not paused by Q/E? not slow-mo? not locked (air juggle)? cooldown ok?
    ├─ score the 8 angles  (readability, section 6)
    ├─ pick target by the beat&#39;s preset (section 5)
-   └─ cutTo(angle):  capture input latch → set cam.ang = cam.target = angle (same tick) → kick zoom/flash
+   └─ cutTo(angle):  capture input latch → set cam.target = angle now → ease cam.ang over 12/16 ticks → kick zoom/flash
 </code></pre>
-<p>A <strong>cut</strong> is instant: <code>cam.ang</code> and <code>cam.target</code> are set together in one tick, with no tween. Reasons: sprite rows don't step through intermediates, the input latch is the only thing governing movement, and it matches how cuts are used in film and in the fighting-game references above.</p>
-<p>Manual Q/E keeps its current eased rotation.</p>
+<p>A <strong>cut</strong> sets the target angle immediately and eases the drawn angle over 12 ticks (hero beats) or 16 ticks (the rest), about a fifth to a quarter of a second. <strong>Decided Oct 5, 2026: eased cuts ship.</strong> The first draft specified a same-tick snap so that sprite rows never step through intermediate angles; the ease trades that for a softer swap, and the input latch keeps movement safe either way. <code>dir.tH</code> and <code>dir.tL</code> are plain numbers: set them to 0 to get the instant cut back. Acceptance test 2b checks the eased behaviour.</p>
+<p>Manual Q/E uses its own eased rotation.</p>
 <h2>5. Beats and shot presets</h2>
-<p>Each beat is a row of data, not code. Priority decides who wins when two beats arrive together or when one wants to bypass the cooldown.</p>
+<p>Each beat is a row of data, not code. Priority decides who wins when two beats arrive together or when one wants to bypass the cooldown. Beats can be switched off one by one in <code>dir.beats</code> (reachable as <code>__vs.dir.beats</code>).</p>
 <table>
 <thead>
 <tr>
@@ -95,34 +101,33 @@ directorTick()  (every tick, right after updateCam, before the hitstop return)
 <th>Priority</th>
 </tr>
 </thead>
-<tbody>
-<tr>
+<tbody><tr>
 <td><strong>Plunge slam</strong></td>
-<td><code>enemyLand()</code> when <code>spiked</code></td>
+<td><code>enemyLand()</code> when spiked</td>
 <td>First frame of the 9-tick hitstop</td>
-<td>Best side-on within ±90°; <strong>forced</strong> cut allowed (see below)</td>
-<td>push .12, focusKick 1, ring</td>
+<td>Best side-on within ±90°; forced cut allowed (see below)</td>
+<td>push, focus kick, ring, letterbox, 70-tick hero shot</td>
 <td>3</td>
 </tr>
 <tr>
 <td><strong>Launcher connects</strong></td>
-<td><code>hurt()</code>, kind <code>launch</code>, first hit when dummy was grounded</td>
-<td>First frame of the 6-tick hitstop</td>
-<td>Best side-on within ±90°; <strong>forced</strong> cut allowed</td>
-<td>push .08</td>
+<td><code>hurt()</code>, kind <code>launch</code>, first hit when the dummy was grounded</td>
+<td>Within a few ticks of the hit, during its hitstop</td>
+<td>Best side-on within ±90°; forced cut allowed</td>
+<td>push, 70-tick hero shot</td>
 <td>3</td>
 </tr>
 <tr>
-<td><strong>Heavy launch</strong> (attack3)</td>
+<td><strong>Heavy launch (attack3)</strong></td>
 <td><code>hurt()</code>, kind <code>heavy</code></td>
 <td>Hitstop</td>
 <td>Only if current view quality is under 0.4</td>
-<td>push .10</td>
+<td>push</td>
 <td>2</td>
 </tr>
 <tr>
-<td><strong>Big knockdown</strong> (non-spike)</td>
-<td><code>enemyLand()</code> when impact speed over 420</td>
+<td><strong>Big knockdown (non-spike)</strong></td>
+<td><code>enemyLand()</code> when impact speed is over 420</td>
 <td>Hitstop</td>
 <td>Only if current view quality is under 0.4</td>
 <td>existing</td>
@@ -130,24 +135,31 @@ directorTick()  (every tick, right after updateCam, before the hitstop return)
 </tr>
 <tr>
 <td><strong>Neutral correction</strong></td>
-<td>Overlap persists 0.5 s while Bram is grounded and Cinder is idle, stunned or getting up</td>
+<td>Current view bad (quality under 0.4) for 30 ticks while Bram is grounded and Cinder is idle, stunned or getting up. <strong>Only when Immersive is off.</strong></td>
 <td>Next tick, no hitstop</td>
 <td>One step toward the best angle, only if clearly better</td>
 <td>none</td>
 <td>1</td>
 </tr>
 <tr>
+<td><strong>Chase</strong></td>
+<td>Immersive on; fighters calm and more than 50 units apart; an angle within 2 steps puts Bram clearly nearer the camera for 24 ticks</td>
+<td>Next tick, no hitstop</td>
+<td>Swing to that angle (up to 2 steps); no readability check</td>
+<td>none</td>
+<td>1</td>
+</tr>
+<tr>
 <td>Light hits, air hits, bounce re-lands, whiffs</td>
 <td>n/a</td>
-<td><strong>No cut</strong></td>
+<td>No cut</td>
 <td>n/a</td>
 <td>existing shake only</td>
 <td>n/a</td>
 </tr>
-</tbody>
-</table>
-<p><strong>Forced cut.</strong> A hero beat (priority 3) is allowed to cut even if the current angle is already fine, because the cut itself is the effect. It picks the highest-scoring angle that is <strong>not</strong> the current one, within 1 to 2 steps, and only if that angle's readability is at least <strong>0.6</strong>. In practice, from an ideal side-on view this swings to a neighbouring step (about 0.71 readability), which reads like film coverage rather than a mistake.</p>
-<p><strong>Lockout during air combos.</strong> While Cinder is airborne and not spiked (<code>E.state==='air' &amp;&amp; !E.spiked</code>), no beat or correction may cut. The launcher cut happens on the hit that starts the juggle; the lock begins right after it. The plunge slam is the one beat that fires as the lock ends (the dummy lands, <code>E.state</code> becomes <code>down</code>).</p>
+</tbody></table>
+<p><strong>Forced cut.</strong> A hero beat (priority 3) may cut even if the current angle is already fine, because the cut itself is the effect. It picks the highest-scoring angle that is not the current one, within 1 to 2 steps, and only if that angle&#39;s readability is at least 0.6.</p>
+<p><strong>Lockout during air combos.</strong> While Cinder is airborne and not spiked, no cut may fire except from two exempt beats in the code: the <strong>launcher</strong> (the juggle has already started by the tick the cut fires, so <code>E.state</code> is <code>air</code> at that moment) and <strong>heavy</strong>. The plunge slam fires as the lock ends. The heavy exemption is not in the first draft and is open (section 10); the launcher exemption is what the first draft meant by &quot;the launcher cut happens on the hit that starts the juggle&quot;.</p>
 <p><strong>Queue expiry.</strong> A beat that cannot be served within 6 ticks is dropped. A late cut feels random.</p>
 <h2>6. Readability check</h2>
 <p>For each of the eight candidate angles θ, compute where Cinder appears relative to Bram on screen, using the same transform as <code>proj()</code>:</p>
@@ -175,46 +187,57 @@ ry = (dx*sinθ + dy*cosθ) * 0.5 - (E.z - P.z) // vertical screen offset (squash
 <li><strong>Release</strong> the latch when any of these happens: raw input magnitude drops below 0.1 (no keys held; touch stick uses its existing 0.15 dead zone), raw input direction changes by 20° or more from <code>latch.dir</code>, <code>resetAll()</code> runs, or the window loses focus.</li>
 <li>Further cuts while latched do <strong>not</strong> replace <code>latch.ang</code>; the original mapping persists until release (matching the carry-over behaviour in the references).</li>
 <li>The bot demo returns world-space movement directly, so it is unaffected.</li>
-<li><strong>Open question (section 10):</strong> apply the same latch to manual Q/E turns. Recommended yes, since it fixes the existing veer.</li>
+<li><strong>Resolved:</strong> manual Q/E turns are latched too (<code>rotate()</code> calls <code>latchNow()</code>), which fixes the old veer.</li>
 </ul>
 <p>The 20° threshold is my choice for keyboard and analog use; the 5° in the reference is tighter than a thumb stick can hold. Tune in playtest.</p>
 <h2>8. Controls and settings</h2>
 <ul>
-<li><strong>Auto camera</strong> toggle button in the <code>#opts</code> bar (<code>data-o=&quot;autocam&quot;</code>), backed by <code>opt.autocam</code>. The existing generic <code>toggle()</code> wiring handles it with no new handler.</li>
-<li><strong>C</strong> key toggles it. Add a line to the controls list.</li>
-<li>Small <strong>AUTO</strong> badge beside the Q/E buttons: on, paused (shows a short countdown), or off. Needed on touch, where there is no key hint.</li>
-<li><strong>Default:</strong> on, except when <code>prefers-reduced-motion: reduce</code> matches, then off. Persist the choice in <code>localStorage</code> inside try/catch (it may be unavailable); the page must work without it.</li>
-<li><strong>Manual override:</strong> Q, E, or the on-screen rotate buttons pause Auto for <strong>4 s</strong> (240 ticks), cancel any queued beat, and extend on each press. When the pause ends, wait 1 s before the first auto-cut.</li>
-<li><strong>Slow motion (T):</strong> no auto-cuts while <code>opt.speed &lt; 1</code>, so frames can be judged undisturbed. A setting can override this later.</li>
-<li><strong>Reduced motion:</strong> the cut flash (below) is off, and zoom kick is halved.</li>
-<li><strong>Cut flash:</strong> a 2-tick, low-alpha screen flash on hero cuts to mask the swap. Because cuts are at least 36 ticks apart, flashes stay well under three per second.</li>
-<li>URL flag <code>?auto=0|1</code> for testing, next to the existing <code>?demo=1</code> and <code>?debug=1</code>.</li>
+<li><strong>Auto camera</strong> toggle in the Settings overlay (Camera group, <code>data-o=&quot;autocam&quot;</code>), backed by <code>opt.autocam</code>. A second toggle there, <strong>Immersive</strong>, controls the chase camera and hero-shot pitch.</li>
+<li><strong>C key</strong> toggles Auto. It is listed in the controls.</li>
+<li><strong>Pause indicator.</strong> While Auto is paused, the Auto camera button reads &quot;Auto paused Ns&quot;, and the F-key overlay shows &quot;paused&quot;. There is no separate badge beside the Q/E buttons, so touch players see the countdown only inside Settings (open item, section 10).</li>
+<li><strong>Default:</strong> on, except when <code>prefers-reduced-motion: reduce</code> matches, then off. The choice persists in <code>localStorage</code> inside try/catch; the page works without it.</li>
+<li><strong>Manual override:</strong> Q, E or the on-screen rotate buttons pause Auto for 4 s (240 ticks), cancel any queued beat, and extend on each press. When the pause ends there is a further 60-tick grace. In practice the first auto-cut can land on tick 300 after the last press, one tick earlier than &quot;after 300&quot;.</li>
+<li><strong>Slow motion (T):</strong> no auto-cuts while <code>opt.speed &lt; 1</code>, so frames can be judged undisturbed.</li>
+<li><strong>Reduced motion:</strong> the cut flash and the plunge letterbox are off, and zoom kick is halved.</li>
+<li><strong>Cut flash:</strong> a screen flash on hero cuts, fading over 8 ticks from 14% opacity. (The first draft said 2 ticks.) Cuts are at least 36 ticks apart, so flashes stay under two per second.</li>
+<li><strong>URL flags:</strong> <code>?auto=0|1</code>, <code>?demo=1</code>, <code>?debug=1</code>, <code>?p1=</code> and <code>?p2=</code> (character ids).</li>
 </ul>
 <h2>9. Debug overlay</h2>
-<p>Extend the existing frame-data overlay (F key):</p>
+<p>The F-key frame-data overlay carries the director readout:</p>
 <ul>
-<li>Line of text: <code>cam 135°  auto on | paused 2.1s | locked:air  cd 0.8s  last: launcher → 135° q.72</code>.</li>
-<li>A small 8-spoke compass showing each angle's quality, with the current angle marked.</li>
-<li>The Bram→Cinder line drawn in the arena, and the latched world heading as an arrow while a latch is active.</li>
-<li>A ring buffer of the last 8 cuts with beat, angle change, quality and tick, so you can tell which cuts earned their place.</li>
-<li>Per-beat on/off switches in <code>dir.beats</code> (reachable from the console via <code>window.__vs</code>) so beats can be A/B tested by feel. Fix the negative-modulo print here too.</li>
+<li>A text line: <code>hitstop N  cam 135°  zoom  auto on | paused | off  q0.72  cd 0.8s  LATCH  last &lt;beat&gt; from→to</code>. The cooldown figure assumes the 90-tick base cooldown.</li>
+<li>An 8-spoke compass showing each angle&#39;s quality, with the current angle highlighted.</li>
+<li>The last three cuts, from a ring buffer that holds eight.</li>
+<li>Per-beat on/off switches in <code>dir.beats</code>, reachable from the console through <code>window.__vs</code>.</li>
 </ul>
-<h2>10. Open questions</h2>
+<p>Not found in the code, and still wanted: the Bram→Cinder line drawn in the arena, and an arrow for the latched world heading.</p>
+<h2>10. Decisions and open questions</h2>
+<p><strong>Settled since the first draft</strong></p>
+<ul>
+<li>Latch manual Q/E turns as well: <strong>yes</strong> (<code>rotate()</code> calls <code>latchNow()</code>).</li>
+<li>Auto defaults to on, with the reduced-motion exception: <strong>yes</strong>.</li>
+<li>Manual pause of 4 s (plus 1 s grace) rather than disabling Auto until re-enabled: <strong>kept</strong>.</li>
+<li>Cut flash: <strong>kept</strong>, on hero cuts only.</li>
+<li>Focus follows height: <strong>done</strong> (<code>cam.fz</code>).</li>
+<li>Instant or eased cuts: <strong>eased</strong> (decided Oct 5, 2026).</li>
+</ul>
+<p><strong>Still open</strong></p>
 <ol>
-<li>Latch manual Q/E too? (Recommended: yes.)</li>
-<li>Should Auto default to on for everyone, or opt-in? (Recommended: on, with reduced-motion exception.)</li>
-<li>Is a 4 s manual pause right, or should any manual turn disable Auto until re-enabled?</li>
-<li>Do you want the cut flash at all, or a clean hard cut? Easy to remove.</li>
-<li>Should the focus follow include height (item 6 in section 3) in this pass? It helps launch shots read; it is a small change.</li>
+<li><strong>Should heavy launches be exempt from the air lockout?</strong> The code exempts them; the first draft did not. The soak run never produced a heavy beat, so the path is untested.</li>
+<li><strong>Cut rate.</strong> The bot demo averaged 21 cuts a minute (30 per minute of combo time), above the 6 to 14 starting guess. Roughly one launcher cut and one plunge cut per combo. Tune by feel, or raise the cooldown for hero beats.</li>
+<li><strong>Pause badge</strong> beside the Q/E buttons for touch players.</li>
+<li><strong>Override edge:</strong> make the resume grace exclusive of tick 300, or reword the test to &quot;300 ticks or more&quot;.</li>
+<li><strong>Debug extras:</strong> Bram→Cinder line and latch arrow.</li>
 </ol>
 <h2>11. Later phases</h2>
 <ul>
 <li>Per-attack camera presets (signature angle and zoom per move).</li>
 <li>A short &quot;cinematic&quot; mode for big finishers: longer hold, closer zoom, brief slow-down.</li>
 <li>Brazier-aware nudging near walls beyond the simple penalty.</li>
-<li>Extra characters once wired in.</li>
 </ul>
 <h2>12. Implementation plan</h2>
+<p><strong>Status (Oct 5, 2026).</strong> Phases 0 to 3 are built. Added beyond the plan: hero shots with pitch change, the Immersive chase camera, twelve playable fighters, and the Fighters and Settings screens. Fixed in this pass: <code>cam.pkt</code> (perspective target) was being swallowed by a comment, so the nearer-is-bigger effect never ran. Remaining work is the open list in section 10.</p>
+
 <p>All edits in <code>source/combat.src.html</code>, then rebuild.</p>
 <p><strong>Phase 0: groundwork</strong></p>
 <ul>
@@ -288,20 +311,96 @@ ry = (dx*sinθ + dy*cosθ) * 0.5 - (E.z - P.z) // vertical screen offset (squash
 </tbody>
 </table>
 <h2>13. Acceptance tests</h2>
-<p>Run through <code>window.__vs</code> (<code>simTick</code>, <code>press</code>, <code>keys</code>, <code>cam</code>) so they are scriptable without rendering.</p>
-<ol>
-<li><strong>Regression:</strong> Auto off, 10 min of bot demo, identical camera behaviour to the current build.</li>
-<li><strong>Cut timing:</strong> every beat cut occurs on a tick where <code>hitstop &gt; 0</code>; <code>cam.ang === cam.target</code> on the same tick; the step is 1 or 2 (45° or 90°).</li>
-<li><strong>Cooldown:</strong> no two cuts closer than 36 ticks; no two within 90 ticks unless the later one has higher priority.</li>
-<li><strong>Air lockout:</strong> zero cuts while <code>E.state==='air' &amp;&amp; !E.spiked</code>.</li>
-<li><strong>Latch:</strong> hold <code>d</code>, trigger a cut, then confirm Bram's world velocity direction is unchanged (within 1°) until <code>d</code> is released or the direction changes 20° or more; afterwards movement follows the new camera.</li>
-<li><strong>Readability:</strong> across 500 random fighter placements, any non-forced cut raises quality by at least 0.25; forced cuts never go below 0.6.</li>
-<li><strong>Override:</strong> after pressing E, no auto-cut for 240 ticks; after that, none for a further 60.</li>
-<li><strong>Slow motion:</strong> no cuts at <code>opt.speed</code> 0.5 or 0.25.</li>
-<li><strong>Reduced motion:</strong> with the media query forced, Auto defaults off and no flash appears.</li>
-<li><strong>Soak:</strong> 5 min of bot demo at accelerated ticks: no NaN, no stuck latch, cut rate within a sane band (start guess: 6 to 14 cuts per minute during combos). Cuts per minute is the key &quot;too much&quot; signal.</li>
-<li><strong>Cost:</strong> director tick under 0.2 ms.</li>
-</ol>
+<p>Run on Oct 5, 2026 with <code>source/test_director.js</code> (Playwright, headless Chromium, seeded random numbers). It loads a temporary copy of the build with the director&#39;s internals exposed, so the shipped page is unchanged. Run it with <code>NODE_PATH=$(npm root -g) node test_director.js out/combat.html [pre-fix-build.html]</code> from <code>source/</code>. Result: <strong>15 pass, 3 warn, 0 fail.</strong></p>
+<table>
+<thead>
+<tr>
+<th>#</th>
+<th>Test</th>
+<th>Result</th>
+<th>Detail</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>1</td>
+<td>Regression, Auto off, 10 min of bot demo</td>
+<td>Pass</td>
+<td>Camera traces identical to the build before the <code>cam.pkt</code> fix; 0 cuts. With Auto on the cut log is identical too.</td>
+</tr>
+<tr>
+<td>2a</td>
+<td>Beat cuts land on a hitstop tick</td>
+<td>Pass</td>
+<td>105 cuts in 5 min (51 launcher, 53 plunge, 1 chase); the 104 beat cuts all landed on hitstop ticks (the chase cut is exempt by design).</td>
+</tr>
+<tr>
+<td>2b</td>
+<td>Eased cut: target set on the cut tick, <code>cam.ang</code> settles within 16 ticks</td>
+<td>Pass</td>
+<td>Replaces the first draft&#39;s same-tick test, since eased cuts were chosen. 105 of 105 cuts set the target at once and settled, the slowest in 16 ticks.</td>
+</tr>
+<tr>
+<td>2c</td>
+<td>Step per cut is 1 or 2</td>
+<td>Pass</td>
+<td>102 one-step, 3 two-step.</td>
+</tr>
+<tr>
+<td>3</td>
+<td>Cooldown</td>
+<td>Pass</td>
+<td>No gap under 36 ticks; none under 90 without higher priority.</td>
+</tr>
+<tr>
+<td>4</td>
+<td>Air lockout</td>
+<td><strong>Warn</strong></td>
+<td>Literal reading: 51 cuts while airborne, all of them the launcher cut on the launching hit (at most 6 ticks after the juggle starts), which section 5 allows. No other cut occurred in the air. The heavy exemption is untested.</td>
+</tr>
+<tr>
+<td>5</td>
+<td>Input latch</td>
+<td>Pass</td>
+<td>World input heading deviated 0° across a cut and a second cut; released on letting go and on a 45° change; followed the new camera afterwards. Measures the input mapping, not Bram&#39;s velocity.</td>
+</tr>
+<tr>
+<td>6</td>
+<td>Readability, 500 random placements</td>
+<td>Pass</td>
+<td>Non-forced cuts gained at least 0.26 (83 cut of 300 trials); forced cuts landed at 0.61 or better (195 of 200).</td>
+</tr>
+<tr>
+<td>7</td>
+<td>Manual override</td>
+<td><strong>Warn</strong></td>
+<td>A queued beat is cancelled; the first auto-cut came on tick 300 after the press, one tick inside the window.</td>
+</tr>
+<tr>
+<td>8</td>
+<td>Slow motion</td>
+<td>Pass</td>
+<td>0 cuts at 0.5× and 0.25× over 300 ticks.</td>
+</tr>
+<tr>
+<td>9</td>
+<td>Reduced motion</td>
+<td>Pass</td>
+<td>Auto defaults off; flash 0 (8 normally); zoom kick 1.5 (3 normally).</td>
+</tr>
+<tr>
+<td>10</td>
+<td>Soak, 5 min of bot demo</td>
+<td><strong>Warn</strong></td>
+<td>No NaN, no page errors, but 21 cuts a minute against the 6 to 14 guess. Heavy, knock and neutral beats never fired. The bot bypasses the latch, so the stuck-latch check is vacuous here.</td>
+</tr>
+<tr>
+<td>11</td>
+<td>Cost</td>
+<td>Pass</td>
+<td>0.008 ms per <code>directorTick()</code> call.</td>
+</tr>
+</tbody></table>
+<p>Not covered: rendering, touch input, and a human playtest of the feel.</p>
 <h2>14. Sources</h2>
 <ul>
 <li>Unity discussion: keeping movement direction across a camera switch until input stops. <a href="https://forum.unity.com/threads/keep-player-movement-direction-on-camera-switch-until-movement-stop.975282/">https://forum.unity.com/threads/keep-player-movement-direction-on-camera-switch-until-movement-stop.975282/</a></li>

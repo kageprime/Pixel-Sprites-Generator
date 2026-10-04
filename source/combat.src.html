@@ -9,25 +9,27 @@ box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:en
 :root[data-theme="dark"]{--bg:#13141a;--fg:#e6e8ee;--mut:#9399a8;--pn:#1d1f27;--bd:#2f333f;--ac:#8fb4d9;--acf:#10131a;--em:#e08a50}
 *{box-sizing:border-box}
 body{margin:0;background:var(--bg);color:var(--fg);font:15px/1.45 system-ui,-apple-system,"Segoe UI",sans-serif;-webkit-tap-highlight-color:transparent}
-main{max-width:1100px;margin:0 auto;padding:16px}
+main{max-width:none;margin:0 auto;padding:12px 16px;--chrome:92px}
+main:has(#touch.show){--chrome:250px}
 h1{font-size:20px;margin:0 0 2px}
 .sub{color:var(--mut);margin:0 0 12px}
-#stage{position:relative;max-width:1100px;margin:0 auto;border:1px solid var(--bd);border-radius:6px;overflow:hidden;background:#0c0d12;touch-action:none;user-select:none;-webkit-user-select:none}
+#stage{position:relative;--s:1;width:100%;margin:0 auto;border:1px solid var(--bd);border-radius:6px;overflow:hidden;background:#0c0d12;touch-action:none;user-select:none;-webkit-user-select:none}
+@media (min-width:732px){#stage{width:min(100%,max(640px,calc((100vh - var(--chrome))*16/9)));width:min(100%,max(640px,calc((100dvh - var(--chrome))*16/9)))}}
 canvas#c{display:block;width:100%;height:auto;image-rendering:pixelated;touch-action:none}
 .hud{position:absolute;pointer-events:none;color:#e6e8ee;font-variant-numeric:tabular-nums;text-shadow:0 1px 2px #000}
-#hpbox{left:10px;top:8px;width:min(46%,300px)}
-#hpname{font-size:12px;letter-spacing:.04em;text-transform:uppercase;opacity:.85;display:flex;justify-content:space-between}
-#hpbar{height:8px;background:rgba(0,0,0,.55);border:1px solid rgba(255,255,255,.28);border-radius:2px;margin-top:3px;overflow:hidden}
+#hpbox{left:calc(10px*var(--s));top:calc(8px*var(--s));width:min(46%,calc(300px*var(--s)))}
+#hpname{font-size:calc(12px*var(--s));letter-spacing:.04em;text-transform:uppercase;opacity:.85;display:flex;justify-content:space-between}
+#hpbar{height:calc(8px*var(--s));background:rgba(0,0,0,.55);border:1px solid rgba(255,255,255,.28);border-radius:2px;margin-top:3px;overflow:hidden}
 #hpfill{height:100%;width:100%;background:linear-gradient(#e8a36a,#b8602c)}
 #hpghost{position:absolute;left:0;top:0;height:100%;background:rgba(255,255,255,.5);width:100%}
-#combo{right:12px;top:6px;text-align:right;opacity:0;transition:opacity .25s}
+#combo{right:calc(12px*var(--s));top:calc(6px*var(--s));text-align:right;opacity:0;transition:opacity .25s}
 #combo.on{opacity:1}
-#cn{font-size:42px;line-height:1;font-weight:800;color:#f3c58f;font-style:italic}
-#cl{font-size:12px;letter-spacing:.14em;opacity:.9}
-#cs{font-size:12px;opacity:.85;margin-top:2px}
-#mv{left:10px;bottom:8px;font-size:12px;opacity:.85;max-width:60%}
+#cn{font-size:calc(42px*var(--s));line-height:1;font-weight:800;color:#f3c58f;font-style:italic}
+#cl{font-size:calc(12px*var(--s));letter-spacing:.14em;opacity:.9}
+#cs{font-size:calc(12px*var(--s));opacity:.85;margin-top:2px}
+#mv{left:calc(10px*var(--s));bottom:calc(8px*var(--s));font-size:calc(12px*var(--s));opacity:.85;max-width:60%}
 #mv b{color:#f3c58f}
-.cambtn{position:absolute;top:50%;transform:translateY(-50%);width:40px;height:56px;padding:0;font-size:20px;line-height:1;background:rgba(20,22,30,.55);color:#e6e8ee;border:1px solid rgba(255,255,255,.22);border-radius:8px;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:2px}
+.cambtn{position:absolute;top:50%;transform:translateY(-50%);width:calc(40px*var(--s));height:calc(56px*var(--s));padding:0;font-size:calc(20px*var(--s));line-height:1;background:rgba(20,22,30,.55);color:#e6e8ee;border:1px solid rgba(255,255,255,.22);border-radius:8px;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:2px}
 .cambtn small{font-size:10px;opacity:.7}
 #camL{left:6px}#camR{right:6px}
 .bar{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin:10px 0 0}
@@ -49,8 +51,8 @@ kbd{font:12px ui-monospace,SFMono-Regular,Menlo,monospace;background:var(--pn);b
 .hint{color:var(--mut);font-size:13px;margin:12px 0 0}
 #load{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;color:#9399a8;background:#0c0d12;font-size:14px}
 
-#dock{position:absolute;right:10px;bottom:8px;display:flex;gap:6px}
-#dock button.t{background:rgba(20,22,30,.7);color:#e6e8ee;border-color:rgba(255,255,255,.25);min-height:32px;padding:5px 11px;font-size:13px}
+#dock{position:absolute;right:calc(10px*var(--s));bottom:calc(8px*var(--s));display:flex;gap:6px}
+#dock button.t{background:rgba(20,22,30,.7);color:#e6e8ee;border-color:rgba(255,255,255,.25);min-height:calc(32px*var(--s));padding:calc(5px*var(--s)) calc(11px*var(--s));font-size:calc(13px*var(--s))}
 .ov{position:fixed;inset:0;z-index:20;display:none;overflow:auto;color:#e4e0d4;background:radial-gradient(120% 80% at 50% 0,#1c212c 0,#0d0f14 62%);padding:max(18px,env(safe-area-inset-top)) 16px max(24px,env(safe-area-inset-bottom))}
 .ov.on{display:block}
 .ov h2,.ov h3{font-family:"Iowan Old Style","Palatino Linotype",Palatino,Georgia,serif;font-weight:600;margin:0}
@@ -180,10 +182,11 @@ function setSize(w,h){
   baseZoom=Math.min(1.14,(w-26)/(2*A));
 }
 function fit(){
-  const cw=document.getElementById('stage').clientWidth||640;
-  const narrow=cw<700;
+  const st=document.getElementById('stage');
+  const narrow=(innerWidth-32)<700;                     // layout switch follows the window, not the stage
   const w=narrow?480:640, h=narrow?430:360;
   if(w!==VW||h!==VH||!S)setSize(w,h);
+  st.style.setProperty('--s',clamp((st.clientWidth||w)/(narrow?480:640),1,2.2).toFixed(3));   // HUD grows with the screen
 }
 
 /* ---------- options / input ---------- */
@@ -284,7 +287,8 @@ function directorTick(){
   const cur=wrap(cam.target); dir.cur=dir.sc[cur/45];
   const imm=opt.immersive; if(dir.shot>0)dir.shot--;                      // hero shots drop to a lower, closer, more dramatic view
   cam.pt=dir.shot>0?.33:(imm?.46:.5);
-  {const el=deg(Math.atan(cam.pt));cam.pv=el<21.3?'p16/':el>32.3?'p38/':''}   // pick the sprite set for the *target* pitch, so the swap lands on the cut cam.pkt=imm?(dir.shot>0?.26:.18):0;
+  {const el=deg(Math.atan(cam.pt));cam.pv=el<21.3?'p16/':el>32.3?'p38/':''}   // pick the sprite set for the *target* pitch, so the swap lands on the cut
+  cam.pkt=imm?(dir.shot>0?.26:.18):0;                                           // perspective target: nearer = bigger
   const calm0=P.state==='ground'&&(E.state==='idle'||E.state==='stun'||E.state==='getup');
   cam.ch+=((imm&&opt.autocam&&dir.pause<=0&&calm0?1:0)-cam.ch)*.04;       // chase cam weight: look past Bram's shoulder at Cinder
   if(dir.q&&tick-dir.qT>6)dir.q=null;
@@ -1048,7 +1052,7 @@ document.querySelectorAll('#opts [data-o]').forEach(b=>b.addEventListener('click
 }));
 /* touch controls */
 const touchBar=$('touch');
-function showTouch(){touchBar.classList.add('show')}
+function showTouch(){touchBar.classList.add('show');fit()}
 if(matchMedia('(pointer:coarse)').matches)showTouch();
 addEventListener('touchstart',showTouch,{once:true,passive:true});
 const stick=$('stick'),knob=$('knob');let stickId=null;
