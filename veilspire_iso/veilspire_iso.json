@@ -1,0 +1,1670 @@
+{
+  "game": "Veilspire",
+  "projection": "2:1 dimetric",
+  "tile": [
+    64,
+    32
+  ],
+  "frames": 6,
+  "directions": [
+    "E",
+    "SE",
+    "S",
+    "SW",
+    "W",
+    "NW",
+    "N",
+    "NE"
+  ],
+  "move_vectors": {
+    "E": [
+      1,
+      0
+    ],
+    "SE": [
+      0.707,
+      0.707
+    ],
+    "S": [
+      0,
+      1
+    ],
+    "SW": [
+      -0.707,
+      0.707
+    ],
+    "W": [
+      -1,
+      0
+    ],
+    "NW": [
+      -0.707,
+      -0.707
+    ],
+    "N": [
+      0,
+      -1
+    ],
+    "NE": [
+      0.707,
+      -0.707
+    ]
+  },
+  "tile_step": {
+    "SE": "+x",
+    "SW": "+y",
+    "NW": "-x",
+    "NE": "-y",
+    "S": "+x+y",
+    "N": "-x-y",
+    "E": "+x-y",
+    "W": "-x+y"
+  },
+  "layout": "one PNG per animation per character; row = direction (order of \"directions\"), column = frame",
+  "height_note": "sprites are never drawn lifted: the engine moves the sprite up by its own z and leaves the shadow on the floor",
+  "tiers": {
+    "standard": {
+      "cell": [
+        96,
+        96
+      ],
+      "anchor": {
+        "x": 48,
+        "y": 74
+      },
+      "shadow": "shadow_standard.png"
+    },
+    "large": {
+      "cell": [
+        128,
+        128
+      ],
+      "anchor": {
+        "x": 64,
+        "y": 100
+      },
+      "shadow": "shadow_large.png"
+    }
+  },
+  "animations": {
+    "idle": {
+      "frames": 6,
+      "fps": 6,
+      "loop": true
+    },
+    "walk": {
+      "frames": 6,
+      "fps": 10,
+      "loop": true
+    },
+    "jump": {
+      "frames": 6,
+      "fps": 12,
+      "loop": false,
+      "frame_roles": [
+        "crouch",
+        "rise",
+        "apex",
+        "fall",
+        "pre_land",
+        "land"
+      ]
+    },
+    "hit": {
+      "frames": 6,
+      "fps": 12,
+      "loop": false
+    },
+    "launch": {
+      "frames": 6,
+      "fps": 14,
+      "loop": false
+    },
+    "tumble": {
+      "frames": 6,
+      "fps": 12,
+      "loop": true,
+      "note": "rows are facings, but the body also spins; any row works for an airborne enemy"
+    },
+    "knockdown": {
+      "frames": 6,
+      "fps": 10,
+      "loop": false,
+      "frame_roles": [
+        "land",
+        "slam",
+        "bounce",
+        "slam",
+        "settle",
+        "settle"
+      ]
+    },
+    "getup": {
+      "frames": 6,
+      "fps": 8,
+      "loop": false
+    },
+    "guard": {
+      "frames": 6,
+      "fps": 12,
+      "loop": false
+    },
+    "dash": {
+      "frames": 6,
+      "fps": 16,
+      "loop": false
+    },
+    "death": {
+      "frames": 6,
+      "fps": 8,
+      "loop": false
+    },
+    "victory": {
+      "frames": 6,
+      "fps": 8,
+      "loop": false
+    },
+    "hit_heavy": {
+      "frames": 6,
+      "fps": 12,
+      "loop": false
+    },
+    "hit_back": {
+      "frames": 6,
+      "fps": 12,
+      "loop": false
+    },
+    "block_hit": {
+      "frames": 6,
+      "fps": 14,
+      "loop": false
+    },
+    "attack": {
+      "frames": 6,
+      "fps": 14,
+      "loop": false,
+      "note": "slots attack1..attack3 are ground skills; launcher, air1 and plunge are the juggle toolkit"
+    },
+    "launcher": {
+      "frames": 6,
+      "fps": 14,
+      "loop": false
+    },
+    "air1": {
+      "frames": 6,
+      "fps": 14,
+      "loop": false
+    },
+    "plunge": {
+      "frames": 6,
+      "fps": 14,
+      "loop": false
+    }
+  },
+  "characters": [
+    {
+      "id": "ren_calder",
+      "name": "Ren Calder",
+      "title": "The Unsealed",
+      "role": "Shade",
+      "weapon": "twinblades",
+      "tier": "standard",
+      "cell": [
+        96,
+        96
+      ],
+      "shadow": "shadow_standard.png",
+      "attacks": [
+        {
+          "slot": "attack1",
+          "style": "slash",
+          "name": "Slash",
+          "hit_frames": [
+            2
+          ],
+          "startup": 2,
+          "cancel_from": 4,
+          "tags": [],
+          "air": false
+        },
+        {
+          "slot": "attack2",
+          "style": "flurry",
+          "name": "Flurry",
+          "hit_frames": [
+            1,
+            2,
+            3,
+            4
+          ],
+          "startup": 1,
+          "cancel_from": 4,
+          "tags": [
+            "multi_hit"
+          ],
+          "air": false
+        },
+        {
+          "slot": "attack3",
+          "style": "whirl",
+          "name": "Whirlwind",
+          "hit_frames": [
+            2,
+            3,
+            4
+          ],
+          "startup": 2,
+          "cancel_from": 5,
+          "tags": [
+            "multi_hit"
+          ],
+          "air": false
+        },
+        {
+          "slot": "launcher",
+          "style": "launcher",
+          "name": "Rising strike",
+          "hit_frames": [
+            2,
+            3
+          ],
+          "startup": 2,
+          "cancel_from": 4,
+          "tags": [
+            "launcher"
+          ],
+          "air": false
+        },
+        {
+          "slot": "air1",
+          "style": "air",
+          "name": "Aerial slash",
+          "hit_frames": [
+            2,
+            3
+          ],
+          "startup": 2,
+          "cancel_from": 4,
+          "tags": [
+            "air_only"
+          ],
+          "air": true
+        },
+        {
+          "slot": "plunge",
+          "style": "plunge",
+          "name": "Plunge",
+          "hit_frames": [
+            3
+          ],
+          "startup": 3,
+          "cancel_from": 5,
+          "tags": [
+            "air_only",
+            "spike"
+          ],
+          "air": true
+        }
+      ],
+      "sheets": {
+        "idle": "ren_calder/idle.png",
+        "walk": "ren_calder/walk.png",
+        "attack1": "ren_calder/attack1.png",
+        "attack2": "ren_calder/attack2.png",
+        "attack3": "ren_calder/attack3.png",
+        "launcher": "ren_calder/launcher.png",
+        "air1": "ren_calder/air1.png",
+        "plunge": "ren_calder/plunge.png",
+        "jump": "ren_calder/jump.png",
+        "launch": "ren_calder/launch.png",
+        "tumble": "ren_calder/tumble.png",
+        "knockdown": "ren_calder/knockdown.png",
+        "getup": "ren_calder/getup.png",
+        "guard": "ren_calder/guard.png",
+        "dash": "ren_calder/dash.png",
+        "death": "ren_calder/death.png",
+        "victory": "ren_calder/victory.png",
+        "hit_heavy": "ren_calder/hit_heavy.png",
+        "hit_back": "ren_calder/hit_back.png",
+        "block_hit": "ren_calder/block_hit.png",
+        "hit": "ren_calder/hit.png"
+      }
+    },
+    {
+      "id": "sera_quill",
+      "name": "Sera Quill",
+      "title": "Stillair",
+      "role": "Weaver",
+      "weapon": "staff",
+      "tier": "standard",
+      "cell": [
+        96,
+        96
+      ],
+      "shadow": "shadow_standard.png",
+      "attacks": [
+        {
+          "slot": "attack1",
+          "style": "cast",
+          "name": "Cast",
+          "hit_frames": [
+            3
+          ],
+          "startup": 3,
+          "cancel_from": 5,
+          "tags": [],
+          "air": false
+        },
+        {
+          "slot": "attack2",
+          "style": "pulse",
+          "name": "Ground pulse",
+          "hit_frames": [
+            3
+          ],
+          "startup": 3,
+          "cancel_from": 5,
+          "tags": [],
+          "air": false
+        },
+        {
+          "slot": "attack3",
+          "style": "sweep",
+          "name": "Wide sweep",
+          "hit_frames": [
+            3
+          ],
+          "startup": 3,
+          "cancel_from": 5,
+          "tags": [],
+          "air": false
+        },
+        {
+          "slot": "launcher",
+          "style": "launcher",
+          "name": "Rising strike",
+          "hit_frames": [
+            2,
+            3
+          ],
+          "startup": 2,
+          "cancel_from": 4,
+          "tags": [
+            "launcher"
+          ],
+          "air": false
+        },
+        {
+          "slot": "air1",
+          "style": "air",
+          "name": "Aerial slash",
+          "hit_frames": [
+            2,
+            3
+          ],
+          "startup": 2,
+          "cancel_from": 4,
+          "tags": [
+            "air_only"
+          ],
+          "air": true
+        },
+        {
+          "slot": "plunge",
+          "style": "plunge",
+          "name": "Plunge",
+          "hit_frames": [
+            3
+          ],
+          "startup": 3,
+          "cancel_from": 5,
+          "tags": [
+            "air_only",
+            "spike"
+          ],
+          "air": true
+        }
+      ],
+      "sheets": {
+        "idle": "sera_quill/idle.png",
+        "walk": "sera_quill/walk.png",
+        "attack1": "sera_quill/attack1.png",
+        "attack2": "sera_quill/attack2.png",
+        "attack3": "sera_quill/attack3.png",
+        "launcher": "sera_quill/launcher.png",
+        "air1": "sera_quill/air1.png",
+        "plunge": "sera_quill/plunge.png",
+        "jump": "sera_quill/jump.png",
+        "launch": "sera_quill/launch.png",
+        "tumble": "sera_quill/tumble.png",
+        "knockdown": "sera_quill/knockdown.png",
+        "getup": "sera_quill/getup.png",
+        "guard": "sera_quill/guard.png",
+        "dash": "sera_quill/dash.png",
+        "death": "sera_quill/death.png",
+        "victory": "sera_quill/victory.png",
+        "hit_heavy": "sera_quill/hit_heavy.png",
+        "hit_back": "sera_quill/hit_back.png",
+        "block_hit": "sera_quill/block_hit.png",
+        "hit": "sera_quill/hit.png"
+      }
+    },
+    {
+      "id": "kade_morr",
+      "name": "Kade Morr",
+      "title": "Red Vein",
+      "role": "Shade",
+      "weapon": "dagger",
+      "tier": "standard",
+      "cell": [
+        96,
+        96
+      ],
+      "shadow": "shadow_standard.png",
+      "attacks": [
+        {
+          "slot": "attack1",
+          "style": "flurry",
+          "name": "Flurry",
+          "hit_frames": [
+            1,
+            2,
+            3,
+            4
+          ],
+          "startup": 1,
+          "cancel_from": 4,
+          "tags": [
+            "multi_hit"
+          ],
+          "air": false
+        },
+        {
+          "slot": "attack2",
+          "style": "slash",
+          "name": "Slash",
+          "hit_frames": [
+            2
+          ],
+          "startup": 2,
+          "cancel_from": 4,
+          "tags": [],
+          "air": false
+        },
+        {
+          "slot": "attack3",
+          "style": "thrust",
+          "name": "Thrust",
+          "hit_frames": [
+            2
+          ],
+          "startup": 2,
+          "cancel_from": 4,
+          "tags": [],
+          "air": false
+        },
+        {
+          "slot": "launcher",
+          "style": "launcher",
+          "name": "Rising strike",
+          "hit_frames": [
+            2,
+            3
+          ],
+          "startup": 2,
+          "cancel_from": 4,
+          "tags": [
+            "launcher"
+          ],
+          "air": false
+        },
+        {
+          "slot": "air1",
+          "style": "air",
+          "name": "Aerial slash",
+          "hit_frames": [
+            2,
+            3
+          ],
+          "startup": 2,
+          "cancel_from": 4,
+          "tags": [
+            "air_only"
+          ],
+          "air": true
+        },
+        {
+          "slot": "plunge",
+          "style": "plunge",
+          "name": "Plunge",
+          "hit_frames": [
+            3
+          ],
+          "startup": 3,
+          "cancel_from": 5,
+          "tags": [
+            "air_only",
+            "spike"
+          ],
+          "air": true
+        }
+      ],
+      "sheets": {
+        "idle": "kade_morr/idle.png",
+        "walk": "kade_morr/walk.png",
+        "attack1": "kade_morr/attack1.png",
+        "attack2": "kade_morr/attack2.png",
+        "attack3": "kade_morr/attack3.png",
+        "launcher": "kade_morr/launcher.png",
+        "air1": "kade_morr/air1.png",
+        "plunge": "kade_morr/plunge.png",
+        "jump": "kade_morr/jump.png",
+        "launch": "kade_morr/launch.png",
+        "tumble": "kade_morr/tumble.png",
+        "knockdown": "kade_morr/knockdown.png",
+        "getup": "kade_morr/getup.png",
+        "guard": "kade_morr/guard.png",
+        "dash": "kade_morr/dash.png",
+        "death": "kade_morr/death.png",
+        "victory": "kade_morr/victory.png",
+        "hit_heavy": "kade_morr/hit_heavy.png",
+        "hit_back": "kade_morr/hit_back.png",
+        "block_hit": "kade_morr/block_hit.png",
+        "hit": "kade_morr/hit.png"
+      }
+    },
+    {
+      "id": "bram_holt",
+      "name": "Bram Holt",
+      "title": "Bastion",
+      "role": "Breaker",
+      "weapon": "maul",
+      "tier": "standard",
+      "cell": [
+        96,
+        96
+      ],
+      "shadow": "shadow_standard.png",
+      "attacks": [
+        {
+          "slot": "attack1",
+          "style": "slam",
+          "name": "Overhead slam",
+          "hit_frames": [
+            3
+          ],
+          "startup": 3,
+          "cancel_from": 5,
+          "tags": [],
+          "air": false
+        },
+        {
+          "slot": "attack2",
+          "style": "sweep",
+          "name": "Wide sweep",
+          "hit_frames": [
+            3
+          ],
+          "startup": 3,
+          "cancel_from": 5,
+          "tags": [],
+          "air": false
+        },
+        {
+          "slot": "attack3",
+          "style": "bash",
+          "name": "Shield bash",
+          "hit_frames": [
+            2
+          ],
+          "startup": 2,
+          "cancel_from": 4,
+          "tags": [
+            "guard_break"
+          ],
+          "air": false
+        },
+        {
+          "slot": "launcher",
+          "style": "launcher",
+          "name": "Rising strike",
+          "hit_frames": [
+            2,
+            3
+          ],
+          "startup": 2,
+          "cancel_from": 4,
+          "tags": [
+            "launcher"
+          ],
+          "air": false
+        },
+        {
+          "slot": "air1",
+          "style": "air",
+          "name": "Aerial slash",
+          "hit_frames": [
+            2,
+            3
+          ],
+          "startup": 2,
+          "cancel_from": 4,
+          "tags": [
+            "air_only"
+          ],
+          "air": true
+        },
+        {
+          "slot": "plunge",
+          "style": "plunge",
+          "name": "Plunge",
+          "hit_frames": [
+            3
+          ],
+          "startup": 3,
+          "cancel_from": 5,
+          "tags": [
+            "air_only",
+            "spike"
+          ],
+          "air": true
+        }
+      ],
+      "sheets": {
+        "idle": "bram_holt/idle.png",
+        "walk": "bram_holt/walk.png",
+        "attack1": "bram_holt/attack1.png",
+        "attack2": "bram_holt/attack2.png",
+        "attack3": "bram_holt/attack3.png",
+        "launcher": "bram_holt/launcher.png",
+        "air1": "bram_holt/air1.png",
+        "plunge": "bram_holt/plunge.png",
+        "jump": "bram_holt/jump.png",
+        "launch": "bram_holt/launch.png",
+        "tumble": "bram_holt/tumble.png",
+        "knockdown": "bram_holt/knockdown.png",
+        "getup": "bram_holt/getup.png",
+        "guard": "bram_holt/guard.png",
+        "dash": "bram_holt/dash.png",
+        "death": "bram_holt/death.png",
+        "victory": "bram_holt/victory.png",
+        "hit_heavy": "bram_holt/hit_heavy.png",
+        "hit_back": "bram_holt/hit_back.png",
+        "block_hit": "bram_holt/block_hit.png",
+        "hit": "bram_holt/hit.png"
+      }
+    },
+    {
+      "id": "nyx_lumen",
+      "name": "Nyx Lumen",
+      "title": "Lantern",
+      "role": "Beacon",
+      "weapon": "lantern",
+      "tier": "standard",
+      "cell": [
+        96,
+        96
+      ],
+      "shadow": "shadow_standard.png",
+      "attacks": [
+        {
+          "slot": "attack1",
+          "style": "cast",
+          "name": "Cast",
+          "hit_frames": [
+            3
+          ],
+          "startup": 3,
+          "cancel_from": 5,
+          "tags": [],
+          "air": false
+        },
+        {
+          "slot": "attack2",
+          "style": "pulse",
+          "name": "Ground pulse",
+          "hit_frames": [
+            3
+          ],
+          "startup": 3,
+          "cancel_from": 5,
+          "tags": [],
+          "air": false
+        },
+        {
+          "slot": "attack3",
+          "style": "sweep",
+          "name": "Wide sweep",
+          "hit_frames": [
+            3
+          ],
+          "startup": 3,
+          "cancel_from": 5,
+          "tags": [],
+          "air": false
+        },
+        {
+          "slot": "launcher",
+          "style": "launcher",
+          "name": "Rising strike",
+          "hit_frames": [
+            2,
+            3
+          ],
+          "startup": 2,
+          "cancel_from": 4,
+          "tags": [
+            "launcher"
+          ],
+          "air": false
+        },
+        {
+          "slot": "air1",
+          "style": "air",
+          "name": "Aerial slash",
+          "hit_frames": [
+            2,
+            3
+          ],
+          "startup": 2,
+          "cancel_from": 4,
+          "tags": [
+            "air_only"
+          ],
+          "air": true
+        },
+        {
+          "slot": "plunge",
+          "style": "plunge",
+          "name": "Plunge",
+          "hit_frames": [
+            3
+          ],
+          "startup": 3,
+          "cancel_from": 5,
+          "tags": [
+            "air_only",
+            "spike"
+          ],
+          "air": true
+        }
+      ],
+      "sheets": {
+        "idle": "nyx_lumen/idle.png",
+        "walk": "nyx_lumen/walk.png",
+        "attack1": "nyx_lumen/attack1.png",
+        "attack2": "nyx_lumen/attack2.png",
+        "attack3": "nyx_lumen/attack3.png",
+        "launcher": "nyx_lumen/launcher.png",
+        "air1": "nyx_lumen/air1.png",
+        "plunge": "nyx_lumen/plunge.png",
+        "jump": "nyx_lumen/jump.png",
+        "launch": "nyx_lumen/launch.png",
+        "tumble": "nyx_lumen/tumble.png",
+        "knockdown": "nyx_lumen/knockdown.png",
+        "getup": "nyx_lumen/getup.png",
+        "guard": "nyx_lumen/guard.png",
+        "dash": "nyx_lumen/dash.png",
+        "death": "nyx_lumen/death.png",
+        "victory": "nyx_lumen/victory.png",
+        "hit_heavy": "nyx_lumen/hit_heavy.png",
+        "hit_back": "nyx_lumen/hit_back.png",
+        "block_hit": "nyx_lumen/block_hit.png",
+        "hit": "nyx_lumen/hit.png"
+      }
+    },
+    {
+      "id": "orin_vale",
+      "name": "Orin Vale",
+      "title": "Longreach",
+      "role": "Lance",
+      "weapon": "spear",
+      "tier": "standard",
+      "cell": [
+        96,
+        96
+      ],
+      "shadow": "shadow_standard.png",
+      "attacks": [
+        {
+          "slot": "attack1",
+          "style": "thrust",
+          "name": "Thrust",
+          "hit_frames": [
+            2
+          ],
+          "startup": 2,
+          "cancel_from": 4,
+          "tags": [],
+          "air": false
+        },
+        {
+          "slot": "attack2",
+          "style": "sweep",
+          "name": "Wide sweep",
+          "hit_frames": [
+            3
+          ],
+          "startup": 3,
+          "cancel_from": 5,
+          "tags": [],
+          "air": false
+        },
+        {
+          "slot": "attack3",
+          "style": "whirl",
+          "name": "Whirlwind",
+          "hit_frames": [
+            2,
+            3,
+            4
+          ],
+          "startup": 2,
+          "cancel_from": 5,
+          "tags": [
+            "multi_hit"
+          ],
+          "air": false
+        },
+        {
+          "slot": "launcher",
+          "style": "launcher",
+          "name": "Rising strike",
+          "hit_frames": [
+            2,
+            3
+          ],
+          "startup": 2,
+          "cancel_from": 4,
+          "tags": [
+            "launcher"
+          ],
+          "air": false
+        },
+        {
+          "slot": "air1",
+          "style": "air",
+          "name": "Aerial slash",
+          "hit_frames": [
+            2,
+            3
+          ],
+          "startup": 2,
+          "cancel_from": 4,
+          "tags": [
+            "air_only"
+          ],
+          "air": true
+        },
+        {
+          "slot": "plunge",
+          "style": "plunge",
+          "name": "Plunge",
+          "hit_frames": [
+            3
+          ],
+          "startup": 3,
+          "cancel_from": 5,
+          "tags": [
+            "air_only",
+            "spike"
+          ],
+          "air": true
+        }
+      ],
+      "sheets": {
+        "idle": "orin_vale/idle.png",
+        "walk": "orin_vale/walk.png",
+        "attack1": "orin_vale/attack1.png",
+        "attack2": "orin_vale/attack2.png",
+        "attack3": "orin_vale/attack3.png",
+        "launcher": "orin_vale/launcher.png",
+        "air1": "orin_vale/air1.png",
+        "plunge": "orin_vale/plunge.png",
+        "jump": "orin_vale/jump.png",
+        "launch": "orin_vale/launch.png",
+        "tumble": "orin_vale/tumble.png",
+        "knockdown": "orin_vale/knockdown.png",
+        "getup": "orin_vale/getup.png",
+        "guard": "orin_vale/guard.png",
+        "dash": "orin_vale/dash.png",
+        "death": "orin_vale/death.png",
+        "victory": "orin_vale/victory.png",
+        "hit_heavy": "orin_vale/hit_heavy.png",
+        "hit_back": "orin_vale/hit_back.png",
+        "block_hit": "orin_vale/block_hit.png",
+        "hit": "orin_vale/hit.png"
+      }
+    },
+    {
+      "id": "mairen_solas",
+      "name": "Mairen Solas",
+      "title": "Mend",
+      "role": "Warden",
+      "weapon": "staff",
+      "tier": "standard",
+      "cell": [
+        96,
+        96
+      ],
+      "shadow": "shadow_standard.png",
+      "attacks": [
+        {
+          "slot": "attack1",
+          "style": "cast",
+          "name": "Cast",
+          "hit_frames": [
+            3
+          ],
+          "startup": 3,
+          "cancel_from": 5,
+          "tags": [],
+          "air": false
+        },
+        {
+          "slot": "attack2",
+          "style": "pulse",
+          "name": "Ground pulse",
+          "hit_frames": [
+            3
+          ],
+          "startup": 3,
+          "cancel_from": 5,
+          "tags": [],
+          "air": false
+        },
+        {
+          "slot": "attack3",
+          "style": "sweep",
+          "name": "Wide sweep",
+          "hit_frames": [
+            3
+          ],
+          "startup": 3,
+          "cancel_from": 5,
+          "tags": [],
+          "air": false
+        },
+        {
+          "slot": "launcher",
+          "style": "launcher",
+          "name": "Rising strike",
+          "hit_frames": [
+            2,
+            3
+          ],
+          "startup": 2,
+          "cancel_from": 4,
+          "tags": [
+            "launcher"
+          ],
+          "air": false
+        },
+        {
+          "slot": "air1",
+          "style": "air",
+          "name": "Aerial slash",
+          "hit_frames": [
+            2,
+            3
+          ],
+          "startup": 2,
+          "cancel_from": 4,
+          "tags": [
+            "air_only"
+          ],
+          "air": true
+        },
+        {
+          "slot": "plunge",
+          "style": "plunge",
+          "name": "Plunge",
+          "hit_frames": [
+            3
+          ],
+          "startup": 3,
+          "cancel_from": 5,
+          "tags": [
+            "air_only",
+            "spike"
+          ],
+          "air": true
+        }
+      ],
+      "sheets": {
+        "idle": "mairen_solas/idle.png",
+        "walk": "mairen_solas/walk.png",
+        "attack1": "mairen_solas/attack1.png",
+        "attack2": "mairen_solas/attack2.png",
+        "attack3": "mairen_solas/attack3.png",
+        "launcher": "mairen_solas/launcher.png",
+        "air1": "mairen_solas/air1.png",
+        "plunge": "mairen_solas/plunge.png",
+        "jump": "mairen_solas/jump.png",
+        "launch": "mairen_solas/launch.png",
+        "tumble": "mairen_solas/tumble.png",
+        "knockdown": "mairen_solas/knockdown.png",
+        "getup": "mairen_solas/getup.png",
+        "guard": "mairen_solas/guard.png",
+        "dash": "mairen_solas/dash.png",
+        "death": "mairen_solas/death.png",
+        "victory": "mairen_solas/victory.png",
+        "hit_heavy": "mairen_solas/hit_heavy.png",
+        "hit_back": "mairen_solas/hit_back.png",
+        "block_hit": "mairen_solas/block_hit.png",
+        "hit": "mairen_solas/hit.png"
+      }
+    },
+    {
+      "id": "irix_venn",
+      "name": "Irix Venn",
+      "title": "Chair of Glass",
+      "role": "Lance",
+      "weapon": "saber",
+      "tier": "standard",
+      "cell": [
+        96,
+        96
+      ],
+      "shadow": "shadow_standard.png",
+      "attacks": [
+        {
+          "slot": "attack1",
+          "style": "thrust",
+          "name": "Thrust",
+          "hit_frames": [
+            2
+          ],
+          "startup": 2,
+          "cancel_from": 4,
+          "tags": [],
+          "air": false
+        },
+        {
+          "slot": "attack2",
+          "style": "slash",
+          "name": "Slash",
+          "hit_frames": [
+            2
+          ],
+          "startup": 2,
+          "cancel_from": 4,
+          "tags": [],
+          "air": false
+        },
+        {
+          "slot": "attack3",
+          "style": "flurry",
+          "name": "Flurry",
+          "hit_frames": [
+            1,
+            2,
+            3,
+            4
+          ],
+          "startup": 1,
+          "cancel_from": 4,
+          "tags": [
+            "multi_hit"
+          ],
+          "air": false
+        },
+        {
+          "slot": "launcher",
+          "style": "launcher",
+          "name": "Rising strike",
+          "hit_frames": [
+            2,
+            3
+          ],
+          "startup": 2,
+          "cancel_from": 4,
+          "tags": [
+            "launcher"
+          ],
+          "air": false
+        },
+        {
+          "slot": "air1",
+          "style": "air",
+          "name": "Aerial slash",
+          "hit_frames": [
+            2,
+            3
+          ],
+          "startup": 2,
+          "cancel_from": 4,
+          "tags": [
+            "air_only"
+          ],
+          "air": true
+        },
+        {
+          "slot": "plunge",
+          "style": "plunge",
+          "name": "Plunge",
+          "hit_frames": [
+            3
+          ],
+          "startup": 3,
+          "cancel_from": 5,
+          "tags": [
+            "air_only",
+            "spike"
+          ],
+          "air": true
+        }
+      ],
+      "sheets": {
+        "idle": "irix_venn/idle.png",
+        "walk": "irix_venn/walk.png",
+        "attack1": "irix_venn/attack1.png",
+        "attack2": "irix_venn/attack2.png",
+        "attack3": "irix_venn/attack3.png",
+        "launcher": "irix_venn/launcher.png",
+        "air1": "irix_venn/air1.png",
+        "plunge": "irix_venn/plunge.png",
+        "jump": "irix_venn/jump.png",
+        "launch": "irix_venn/launch.png",
+        "tumble": "irix_venn/tumble.png",
+        "knockdown": "irix_venn/knockdown.png",
+        "getup": "irix_venn/getup.png",
+        "guard": "irix_venn/guard.png",
+        "dash": "irix_venn/dash.png",
+        "death": "irix_venn/death.png",
+        "victory": "irix_venn/victory.png",
+        "hit_heavy": "irix_venn/hit_heavy.png",
+        "hit_back": "irix_venn/hit_back.png",
+        "block_hit": "irix_venn/block_hit.png",
+        "hit": "irix_venn/hit.png"
+      }
+    },
+    {
+      "id": "juno_rake",
+      "name": "Juno Rake",
+      "title": "Emberwake",
+      "role": "Weaver",
+      "weapon": "staff",
+      "tier": "standard",
+      "cell": [
+        96,
+        96
+      ],
+      "shadow": "shadow_standard.png",
+      "attacks": [
+        {
+          "slot": "attack1",
+          "style": "cast",
+          "name": "Cast",
+          "hit_frames": [
+            3
+          ],
+          "startup": 3,
+          "cancel_from": 5,
+          "tags": [],
+          "air": false
+        },
+        {
+          "slot": "attack2",
+          "style": "pulse",
+          "name": "Ground pulse",
+          "hit_frames": [
+            3
+          ],
+          "startup": 3,
+          "cancel_from": 5,
+          "tags": [],
+          "air": false
+        },
+        {
+          "slot": "attack3",
+          "style": "sweep",
+          "name": "Wide sweep",
+          "hit_frames": [
+            3
+          ],
+          "startup": 3,
+          "cancel_from": 5,
+          "tags": [],
+          "air": false
+        },
+        {
+          "slot": "launcher",
+          "style": "launcher",
+          "name": "Rising strike",
+          "hit_frames": [
+            2,
+            3
+          ],
+          "startup": 2,
+          "cancel_from": 4,
+          "tags": [
+            "launcher"
+          ],
+          "air": false
+        },
+        {
+          "slot": "air1",
+          "style": "air",
+          "name": "Aerial slash",
+          "hit_frames": [
+            2,
+            3
+          ],
+          "startup": 2,
+          "cancel_from": 4,
+          "tags": [
+            "air_only"
+          ],
+          "air": true
+        },
+        {
+          "slot": "plunge",
+          "style": "plunge",
+          "name": "Plunge",
+          "hit_frames": [
+            3
+          ],
+          "startup": 3,
+          "cancel_from": 5,
+          "tags": [
+            "air_only",
+            "spike"
+          ],
+          "air": true
+        }
+      ],
+      "sheets": {
+        "idle": "juno_rake/idle.png",
+        "walk": "juno_rake/walk.png",
+        "attack1": "juno_rake/attack1.png",
+        "attack2": "juno_rake/attack2.png",
+        "attack3": "juno_rake/attack3.png",
+        "launcher": "juno_rake/launcher.png",
+        "air1": "juno_rake/air1.png",
+        "plunge": "juno_rake/plunge.png",
+        "jump": "juno_rake/jump.png",
+        "launch": "juno_rake/launch.png",
+        "tumble": "juno_rake/tumble.png",
+        "knockdown": "juno_rake/knockdown.png",
+        "getup": "juno_rake/getup.png",
+        "guard": "juno_rake/guard.png",
+        "dash": "juno_rake/dash.png",
+        "death": "juno_rake/death.png",
+        "victory": "juno_rake/victory.png",
+        "hit_heavy": "juno_rake/hit_heavy.png",
+        "hit_back": "juno_rake/hit_back.png",
+        "block_hit": "juno_rake/block_hit.png",
+        "hit": "juno_rake/hit.png"
+      }
+    },
+    {
+      "id": "cinder",
+      "name": "Cinder",
+      "title": "Host unit",
+      "role": "Shade",
+      "weapon": "longsword",
+      "tier": "standard",
+      "cell": [
+        96,
+        96
+      ],
+      "shadow": "shadow_standard.png",
+      "attacks": [
+        {
+          "slot": "attack1",
+          "style": "slash",
+          "name": "Slash",
+          "hit_frames": [
+            2
+          ],
+          "startup": 2,
+          "cancel_from": 4,
+          "tags": [],
+          "air": false
+        },
+        {
+          "slot": "attack2",
+          "style": "thrust",
+          "name": "Thrust",
+          "hit_frames": [
+            2
+          ],
+          "startup": 2,
+          "cancel_from": 4,
+          "tags": [],
+          "air": false
+        },
+        {
+          "slot": "attack3",
+          "style": "whirl",
+          "name": "Whirlwind",
+          "hit_frames": [
+            2,
+            3,
+            4
+          ],
+          "startup": 2,
+          "cancel_from": 5,
+          "tags": [
+            "multi_hit"
+          ],
+          "air": false
+        },
+        {
+          "slot": "launcher",
+          "style": "launcher",
+          "name": "Rising strike",
+          "hit_frames": [
+            2,
+            3
+          ],
+          "startup": 2,
+          "cancel_from": 4,
+          "tags": [
+            "launcher"
+          ],
+          "air": false
+        },
+        {
+          "slot": "air1",
+          "style": "air",
+          "name": "Aerial slash",
+          "hit_frames": [
+            2,
+            3
+          ],
+          "startup": 2,
+          "cancel_from": 4,
+          "tags": [
+            "air_only"
+          ],
+          "air": true
+        },
+        {
+          "slot": "plunge",
+          "style": "plunge",
+          "name": "Plunge",
+          "hit_frames": [
+            3
+          ],
+          "startup": 3,
+          "cancel_from": 5,
+          "tags": [
+            "air_only",
+            "spike"
+          ],
+          "air": true
+        }
+      ],
+      "sheets": {
+        "idle": "cinder/idle.png",
+        "walk": "cinder/walk.png",
+        "attack1": "cinder/attack1.png",
+        "attack2": "cinder/attack2.png",
+        "attack3": "cinder/attack3.png",
+        "launcher": "cinder/launcher.png",
+        "air1": "cinder/air1.png",
+        "plunge": "cinder/plunge.png",
+        "jump": "cinder/jump.png",
+        "launch": "cinder/launch.png",
+        "tumble": "cinder/tumble.png",
+        "knockdown": "cinder/knockdown.png",
+        "getup": "cinder/getup.png",
+        "guard": "cinder/guard.png",
+        "dash": "cinder/dash.png",
+        "death": "cinder/death.png",
+        "victory": "cinder/victory.png",
+        "hit_heavy": "cinder/hit_heavy.png",
+        "hit_back": "cinder/hit_back.png",
+        "block_hit": "cinder/block_hit.png",
+        "hit": "cinder/hit.png"
+      }
+    },
+    {
+      "id": "the_carapace",
+      "name": "The Carapace",
+      "title": "Floor horror",
+      "role": "Breaker",
+      "weapon": "gauntlets",
+      "tier": "large",
+      "cell": [
+        128,
+        128
+      ],
+      "shadow": "shadow_large.png",
+      "attacks": [
+        {
+          "slot": "attack1",
+          "style": "flurry",
+          "name": "Flurry",
+          "hit_frames": [
+            1,
+            2,
+            3,
+            4
+          ],
+          "startup": 1,
+          "cancel_from": 4,
+          "tags": [
+            "multi_hit"
+          ],
+          "air": false
+        },
+        {
+          "slot": "attack2",
+          "style": "slam",
+          "name": "Overhead slam",
+          "hit_frames": [
+            3
+          ],
+          "startup": 3,
+          "cancel_from": 5,
+          "tags": [],
+          "air": false
+        },
+        {
+          "slot": "attack3",
+          "style": "sweep",
+          "name": "Wide sweep",
+          "hit_frames": [
+            3
+          ],
+          "startup": 3,
+          "cancel_from": 5,
+          "tags": [],
+          "air": false
+        },
+        {
+          "slot": "launcher",
+          "style": "launcher",
+          "name": "Rising strike",
+          "hit_frames": [
+            2,
+            3
+          ],
+          "startup": 2,
+          "cancel_from": 4,
+          "tags": [
+            "launcher"
+          ],
+          "air": false
+        },
+        {
+          "slot": "air1",
+          "style": "air",
+          "name": "Aerial slash",
+          "hit_frames": [
+            2,
+            3
+          ],
+          "startup": 2,
+          "cancel_from": 4,
+          "tags": [
+            "air_only"
+          ],
+          "air": true
+        },
+        {
+          "slot": "plunge",
+          "style": "plunge",
+          "name": "Plunge",
+          "hit_frames": [
+            3
+          ],
+          "startup": 3,
+          "cancel_from": 5,
+          "tags": [
+            "air_only",
+            "spike"
+          ],
+          "air": true
+        }
+      ],
+      "sheets": {
+        "idle": "the_carapace/idle.png",
+        "walk": "the_carapace/walk.png",
+        "attack1": "the_carapace/attack1.png",
+        "attack2": "the_carapace/attack2.png",
+        "attack3": "the_carapace/attack3.png",
+        "launcher": "the_carapace/launcher.png",
+        "air1": "the_carapace/air1.png",
+        "plunge": "the_carapace/plunge.png",
+        "jump": "the_carapace/jump.png",
+        "launch": "the_carapace/launch.png",
+        "tumble": "the_carapace/tumble.png",
+        "knockdown": "the_carapace/knockdown.png",
+        "getup": "the_carapace/getup.png",
+        "guard": "the_carapace/guard.png",
+        "dash": "the_carapace/dash.png",
+        "death": "the_carapace/death.png",
+        "victory": "the_carapace/victory.png",
+        "hit_heavy": "the_carapace/hit_heavy.png",
+        "hit_back": "the_carapace/hit_back.png",
+        "block_hit": "the_carapace/block_hit.png",
+        "hit": "the_carapace/hit.png"
+      }
+    },
+    {
+      "id": "floor_voice",
+      "name": "Floor Voice",
+      "title": "The test",
+      "role": "Beacon",
+      "weapon": "tablet",
+      "tier": "standard",
+      "cell": [
+        96,
+        96
+      ],
+      "shadow": "shadow_standard.png",
+      "attacks": [
+        {
+          "slot": "attack1",
+          "style": "cast",
+          "name": "Cast",
+          "hit_frames": [
+            3
+          ],
+          "startup": 3,
+          "cancel_from": 5,
+          "tags": [],
+          "air": false
+        },
+        {
+          "slot": "attack2",
+          "style": "pulse",
+          "name": "Ground pulse",
+          "hit_frames": [
+            3
+          ],
+          "startup": 3,
+          "cancel_from": 5,
+          "tags": [],
+          "air": false
+        },
+        {
+          "slot": "launcher",
+          "style": "launcher",
+          "name": "Rising strike",
+          "hit_frames": [
+            2,
+            3
+          ],
+          "startup": 2,
+          "cancel_from": 4,
+          "tags": [
+            "launcher"
+          ],
+          "air": false
+        },
+        {
+          "slot": "air1",
+          "style": "air",
+          "name": "Aerial slash",
+          "hit_frames": [
+            2,
+            3
+          ],
+          "startup": 2,
+          "cancel_from": 4,
+          "tags": [
+            "air_only"
+          ],
+          "air": true
+        },
+        {
+          "slot": "plunge",
+          "style": "plunge",
+          "name": "Plunge",
+          "hit_frames": [
+            3
+          ],
+          "startup": 3,
+          "cancel_from": 5,
+          "tags": [
+            "air_only",
+            "spike"
+          ],
+          "air": true
+        }
+      ],
+      "sheets": {
+        "idle": "floor_voice/idle.png",
+        "walk": "floor_voice/walk.png",
+        "attack1": "floor_voice/attack1.png",
+        "attack2": "floor_voice/attack2.png",
+        "launcher": "floor_voice/launcher.png",
+        "air1": "floor_voice/air1.png",
+        "plunge": "floor_voice/plunge.png",
+        "jump": "floor_voice/jump.png",
+        "launch": "floor_voice/launch.png",
+        "tumble": "floor_voice/tumble.png",
+        "knockdown": "floor_voice/knockdown.png",
+        "getup": "floor_voice/getup.png",
+        "guard": "floor_voice/guard.png",
+        "dash": "floor_voice/dash.png",
+        "death": "floor_voice/death.png",
+        "victory": "floor_voice/victory.png",
+        "hit_heavy": "floor_voice/hit_heavy.png",
+        "hit_back": "floor_voice/hit_back.png",
+        "block_hit": "floor_voice/block_hit.png",
+        "hit": "floor_voice/hit.png"
+      }
+    }
+  ],
+  "pitches": {
+    "base": {
+      "elevation": 26.565,
+      "dir": ""
+    },
+    "p16": {
+      "elevation": 16,
+      "dir": "p16/"
+    },
+    "p38": {
+      "elevation": 38,
+      "dir": "p38/"
+    }
+  },
+  "pitch_note": "same layout as the base sheets; sprites for a pitch live in <char>/<dir>/<anim>.png. Never swap pitch mid-pose; swap on a camera cut."
+}
