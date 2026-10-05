@@ -128,11 +128,11 @@ def main():
         for f, box in enumerate(((0, 0, W // 2, H // 2), (W // 2, 0, W, H // 2))):
             frame = pixelize(im.crop(box), 64)
             frame.save(os.path.join(OUT, "aud%02d_%s.png" % (i, "ab"[f])))
-    # Banners: 4 horizontal strips
+    # Banners: 4 horizontal strips, kept at 2:1 to match the in-game billboard
     b = decode_vtf("te_banner.vtf")
     W, H = b.size
     for n in range(4):
-        strip = pixelize(b.crop((0, H * n // 4, W, H * (n + 1) // 4)).resize((256, 64)), 128)
+        strip = b.crop((0, H * n // 4, W, H * (n + 1) // 4)).resize((128, 64), Image.LANCZOS)
         strip.save(os.path.join(OUT, "banner%d.png" % n))
     print("wrote", len(os.listdir(OUT)), "files to", OUT)
 
