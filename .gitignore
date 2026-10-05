@@ -1,0 +1,6 @@
+# Regenerable / oversized artefacts. veilspire_toon/web/ IS committed on purpose:
+# the toon skin lazy-loads it per fight and Vercel serves it as static files.
+veilspire_toon/veilspire_iso/OUT/
+veilspire_toon/veilspire_iso/__pycache__/
+veilspire_iso/__pycache__/
+source/__pycache__/

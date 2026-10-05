@@ -1,0 +1,15 @@
+# Static deploy: prebuilt combat.html ships pixel sprites inline, no build step.
+# Toon skin loads veilspire_toon/web/ per fight. Keep large sources and dev
+# artefacts out of the Vercel deployment.
+misc/*.zip
+misc/vweilspire_iso/
+veilspire_iso/__pycache__/
+source/out/
+source/__pycache__/
+veilspire_toon/veilspire_iso/OUT/
+veilspire_toon/veilspire_iso/__pycache__/
+veilspire_toon/veilspire_iso/gen_*.py
+veilspire_toon/veilspire_iso/*.orig
+veilspire_toon/source/
+veilspire_toon/previews/
+veilspire_toon/make_web.py

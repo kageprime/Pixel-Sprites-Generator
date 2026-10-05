@@ -22,6 +22,10 @@ ad='../veilspire_iso/arena'
 if os.path.isdir(ad):
     for p in sorted(glob.glob(f'{ad}/*.png')):
         img['arena/'+os.path.splitext(os.path.basename(p))[0]]=b64(p)
+vd='../veilspire_iso/vfx'
+if os.path.isdir(vd):
+    for p in sorted(glob.glob(f'{vd}/*.png')):
+        img['vfx/'+os.path.splitext(os.path.basename(p))[0]]=b64(p)
 src=open('combat.src.html').read()
 os.makedirs('out',exist_ok=True)
 open('out/combat.html','w').write(src.replace('/*DATA*/null',json.dumps({'M':M,'img':img},separators=(',',':'))))
