@@ -1,0 +1,79 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Veilspire Studio</title>
+<style>
+:root{--bg:#131217;--p:#1b1a21;--l:#2c2a35;--t:#e9e3d6;--m:#8d8898;--a:#c8a062;--r:#c4584a}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--t);font:14px/1.45 ui-sans-serif,system-ui,sans-serif}
+h1{font:600 22px Georgia,serif;margin:0;letter-spacing:.02em}h2{font:600 15px Georgia,serif;margin:0 0 10px;color:var(--a)}
+header{display:flex;align-items:baseline;gap:14px;padding:14px 20px;border-bottom:1px solid var(--l)}header small{color:var(--m)}
+main{display:grid;grid-template-columns:310px minmax(0,1fr) 340px;gap:14px;padding:14px}
+@media(max-width:1100px){main{grid-template-columns:1fr}}
+section{background:var(--p);border:1px solid var(--l);border-radius:8px;padding:14px}
+label{display:grid;grid-template-columns:78px 1fr;align-items:center;gap:8px;margin:5px 0;color:var(--m);font-size:13px}
+input,select,textarea,button{font:inherit;color:var(--t);background:#0e0d12;border:1px solid var(--l);border-radius:5px;padding:5px 7px;min-width:0}
+input[type=color]{padding:0;height:26px;width:100%}input[type=checkbox]{width:auto;justify-self:start}input[type=range]{padding:0}
+button{cursor:pointer;background:var(--l)}button:hover{border-color:var(--a)}button.go{background:var(--a);color:#16130d;border-color:var(--a);font-weight:600}button.x{color:var(--r)}
+.row{display:flex;flex-wrap:wrap;gap:6px;margin:8px 0}.chars button{padding:3px 8px;font-size:13px}.chars .on{border-color:var(--a);color:var(--a)}.chars .cu::after{content:" ✦";color:var(--a)}
+#stage{display:flex;gap:16px;align-items:flex-start;flex-wrap:wrap}canvas{background:#1f1e27;border:1px solid var(--l);border-radius:6px;image-rendering:pixelated}
+#sheetbox{overflow:auto;border:1px solid var(--l);border-radius:6px;margin-top:10px;background:repeating-conic-gradient(#1c1b22 0 25%,#17161c 0 50%) 0 0/16px 16px}#sheet{image-rendering:pixelated;display:block}
+textarea{width:100%;height:210px;font:12px/1.4 ui-monospace,monospace;white-space:pre}pre{background:#0e0d12;border:1px solid var(--l);border-radius:5px;padding:8px;max-height:170px;overflow:auto;font-size:12px;color:var(--m);white-space:pre-wrap;margin:8px 0 0}
+.dirs button{padding:2px 7px;font-size:12px}.dirs .on{background:var(--a);color:#16130d}#msg{color:var(--m);font-size:12px;min-height:18px}
+</style></head><body>
+<header><h1>Veilspire Studio</h1><small>runs the real generators on this machine · <span id="msg">loading…</span></small></header>
+<main>
+<section><h2>Characters</h2><div class="chars row" id="list"></div><div class="row"><button id="new">+ New from current</button><button id="del" class="x">Delete / reset</button></div><div id="form"></div></section>
+<section><h2>Preview</h2>
+<div class="row"><select id="anim"></select><select id="pitch"></select><input id="pcustom" type="number" min="5" max="80" step="1" placeholder="° custom" style="width:84px"></div>
+<div class="row dirs" id="dirs"></div>
+<div id="stage"><canvas id="cv"></canvas><div><p style="color:var(--m);margin:0 0 8px">Camera pitch changes the whole look: 16° is low and dramatic, 38° is closer to top-down. Edits above re-render live.</p><a id="dl" download="sheet.png"><button>Download this sheet (PNG)</button></a></div></div>
+<div id="sheetbox"><img id="sheet" alt=""></div></section>
+<section><h2>Move lab</h2><p style="color:var(--m);margin:0 0 8px;font-size:13px">Pick a base move, edit its 6 poses (lean, ft, bt, fa, w, fx…), and add it to this character.</p>
+<div class="row"><select id="base"></select><button id="load">Load poses</button></div><textarea id="poses" spellcheck="false"></textarea>
+<div class="row"><input id="mname" placeholder="move name" style="width:130px"><button id="addmove" class="go">Add / update move</button></div><div class="row" id="moves"></div>
+<h2 style="margin-top:16px">Pipeline</h2>
+<label style="grid-template-columns:auto 1fr"><input type="checkbox" id="pit" checked>also render p16 + p38 pitches</label>
+<div class="row"><button class="go" id="save">Save character</button><button class="go" id="export">Export sheets to disk</button></div>
+<div class="row"><button id="audit">Run audit</button><button id="build">Rebuild combat.html</button></div><pre id="log">Export writes &lt;id&gt;/&lt;anim&gt;.png and updates veilspire_iso.json.</pre></section>
+</main>
+<script>
+const $=s=>document.querySelector(s),msg=t=>$('#msg').textContent=t;let ST,C,SH,row=2,tm,seq=0,deb;
+const hex=a=>'#'+a.map(v=>(+v).toString(16).padStart(2,'0')).join(''),rgb=h=>[1,3,5].map(i=>parseInt(h.slice(i,i+2),16));
+async function api(p,b){const r=await fetch('/api/'+p,b?{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(b)}:{});const j=await r.json();if(j.error)throw new Error(j.error);return j}
+const opt=(a,v)=>a.map(x=>`<option${x==v?' selected':''}>${x}</option>`).join('');
+const TXT=['name','title'],SEL=['role','rank','helm','chest','legs','back','weapon','offhand','aura'],COL=['tone','pri','sec','acc','emi'],CHK=['pauldron','eyes','jointglow','big'];
+const COLN={tone:'skin/tone',pri:'primary',sec:'secondary',acc:'accent',emi:'glow'};
+function form(){let h='';TXT.forEach(k=>h+=`<label>${k}<input data-k="${k}" value="${C[k]||''}"></label>`);
+SEL.forEach(k=>h+=`<label>${k}<select data-k="${k}">${opt(ST.opts[k],C[k])}</select></label>`);
+COL.forEach(k=>h+=`<label>${COLN[k]}<input type="color" data-c="${k}" value="${hex(C[k])}"></label>`);
+[['thick',.6,1.8],['height',.9,1.5]].forEach(([k,a,b])=>h+=`<label>${k}<input type="range" data-n="${k}" min="${a}" max="${b}" step=".05" value="${C[k]}"></label>`);
+for(let i=0;i<3;i++)h+=`<label>skill ${i+1}<select data-s="${i}"><option value="">(weapon default)</option>${opt(ST.styles,(C.skills||[])[i])}</select></label>`;
+CHK.forEach(k=>h+=`<label style="grid-template-columns:auto 1fr"><input type="checkbox" data-b="${k}"${C[k]?' checked':''}>${k=='big'?'large tier (128px cell)':k}</label>`);
+$('#form').innerHTML=h}
+$('#form').addEventListener('input',e=>{const d=e.target.dataset;if(d.k)C[d.k]=e.target.value;if(d.c)C[d.c]=rgb(e.target.value);if(d.n)C[d.n]=+e.target.value;if(d.b)C[d.b]=e.target.checked;
+ if(d.s){C.skills=C.skills||['','',''];C.skills[d.s]=e.target.value}clearTimeout(deb);deb=setTimeout(draw,450)});
+function animList(){return ST.anims.concat(Object.keys(C.moves||{}).map(k=>'move_'+k))}
+function lists(){const cur=$('#anim').value||'idle';$('#anim').innerHTML=opt(animList(),cur);$('#moves').innerHTML=Object.keys(C.moves||{}).map(k=>`<button data-m="${k}" class="x">${k} ✕</button>`).join('')||'<small style="color:var(--m)">no custom moves yet</small>';
+ $('#list').innerHTML=ST.roster.map(s=>`<button data-id="${s.id}" class="${s.id==C.id?'on ':''}${ST.custom.includes(s.id)?'cu':''}">${s.name}</button>`).join('')}
+$('#list').onclick=e=>{const s=ST.roster.find(x=>x.id==e.target.dataset.id);if(s){C=JSON.parse(JSON.stringify(s));form();lists();draw()}};
+$('#moves').onclick=e=>{const k=e.target.dataset.m;if(k){delete C.moves[k];lists();draw()}};
+$('#new').onclick=()=>{const n=prompt('Name for the new character?');if(!n)return;C=JSON.parse(JSON.stringify(C));C.name=n;C.id=n.toLowerCase().replace(/\W+/g,'_');form();lists();draw()};
+$('#del').onclick=async()=>{if(!confirm('Remove the custom entry for '+C.name+'? (built-ins revert to default)'))return;await api('delete',{char:C});await boot(C.id)};
+const pitchVal=()=>+$('#pcustom').value||ST.pitches[$('#pitch').value];
+async function draw(){const my=++seq;msg('rendering…');try{const r=await api('render',{char:C,anim:$('#anim').value,pitch:pitchVal()});if(my!=seq)return;
+ const im=new Image();im.onload=()=>{SH={img:im,cell:r.cell,ax:r.ax,ay:r.ay};$('#sheet').src=im.src;$('#dl').href=im.src;$('#dl').download=`${C.id}_${$('#anim').value}.png`;msg(`rendered in ${r.ms} ms`);play()};im.src='data:image/png;base64,'+r.png}catch(e){msg('error: '+e.message)}}
+function play(){clearInterval(tm);if(!SH)return;const cv=$('#cv'),x=cv.getContext('2d'),c=SH.cell,Z=3,a=$('#anim').value;cv.width=cv.height=c*Z;x.imageSmoothingEnabled=false;let i=0;
+ const fps=(ST.meta[a]||[14])[0];tm=setInterval(()=>{x.clearRect(0,0,c*Z,c*Z);x.fillStyle='#2a2833';x.beginPath();x.moveTo(SH.ax*Z,(SH.ay-16)*Z);x.lineTo((SH.ax+32)*Z,SH.ay*Z);x.lineTo(SH.ax*Z,(SH.ay+16)*Z);x.lineTo((SH.ax-32)*Z,SH.ay*Z);x.fill();
+ x.drawImage(SH.img,i*c,row*c,c,c,0,0,c*Z,c*Z);i=(i+1)%6},1000/fps)}
+$('#dirs').innerHTML=''; function dirs(){$('#dirs').innerHTML=ST.dirs.map((d,i)=>`<button data-r="${i}" class="${i==row?'on':''}">${d}</button>`).join('')}
+$('#dirs').onclick=e=>{if(e.target.dataset.r){row=+e.target.dataset.r;dirs();play()}};
+$('#anim').onchange=draw;$('#pitch').onchange=()=>{$('#pcustom').value='';draw()};$('#pcustom').onchange=draw;
+$('#load').onclick=()=>{const t=ST.tables[$('#base').value];$('#poses').value='[\n'+t.map(p=>' '+JSON.stringify(p)).join(',\n')+'\n]'};
+$('#addmove').onclick=()=>{try{const p=JSON.parse($('#poses').value),n=$('#mname').value.trim().replace(/\W+/g,'_');if(!n)return msg('name the move first');C.moves=C.moves||{};C.moves[n]=p;lists();$('#anim').value='move_'+n;draw()}catch(e){msg('bad JSON: '+e.message)}};
+const log=t=>$('#log').textContent=t;
+async function job(p,b,w){log(w+'…');msg('working…');try{const r=await api(p,b);log(r.log||'saved');msg('done');return r}catch(e){log('error: '+e.message);msg('error')}}
+$('#save').onclick=async()=>{await job('save',{char:C},'saving');await boot(C.id)};
+$('#export').onclick=async()=>{await job('export',{char:C,pitches:$('#pit').checked},'exporting (this can take a minute)');await boot(C.id)};
+$('#audit').onclick=()=>job('run',{cmd:'audit'},'auditing');$('#build').onclick=()=>job('run',{cmd:'build'},'rebuilding combat.html');
+async function boot(id){ST=await api('state');const s=ST.roster.find(x=>x.id==id)||ST.roster[0];C=JSON.parse(JSON.stringify(s));
+ $('#pitch').innerHTML=Object.keys(ST.pitches).map(k=>`<option value="${k}">${k=='base'?'base 26.6° (shipped)':k.slice(1)+'°'}</option>`).join('');
+ $('#base').innerHTML=opt(Object.keys(ST.tables));dirs();form();lists();draw()}
+boot().catch(e=>msg('server error: '+e.message));
+</script></body></html>
