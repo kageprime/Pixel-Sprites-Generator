@@ -4,3 +4,8 @@ veilspire_toon/veilspire_iso/OUT/
 veilspire_toon/veilspire_iso/__pycache__/
 veilspire_iso/__pycache__/
 source/__pycache__/
+# Vite (Phase 0+): install output, build output, generated manifest, toon mirror
+node_modules/
+dist/
+src/assets/art.ts
+public/toons/
