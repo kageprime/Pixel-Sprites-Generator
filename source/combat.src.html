@@ -1,7 +1,7 @@
 <!doctype html>
 <html lang="en"><head><meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>Veilspire combat test</title>
+<title>Veilspire Arena</title>
 <style>
 :root{--bg:#eceef2;--fg:#1b1d24;--mut:#656a78;--pn:#fff;--bd:#cfd3dc;--ac:#3d6a99;--acf:#fff;--em:#b8602c;
 box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
@@ -89,8 +89,8 @@ kbd{font:12px ui-monospace,SFMono-Regular,Menlo,monospace;background:var(--pn);b
 #busy{position:absolute;inset:0;z-index:30;display:none;align-items:center;justify-content:center;background:rgba(8,9,13,.8);color:#e4e0d4;font-size:15px}#busy.on{display:flex}
 </style></head>
 <body><main>
-<h1>Veilspire combat test</h1>
-<p class="sub">Versus training. You play P1, P2 stands in as the dummy. Change fighters and options from the buttons on the arena.</p>
+<h1>Veilspire Arena</h1>
+<p class="sub">Tournament bout at the Veilspire ring. You play P1, P2 stands in as the dummy. Move with WASD or arrows, strike with J or left-click, launch with K or right-click. Fighters and options are on the arena.</p>
 <div id="stage">
   <canvas id="c" width="640" height="360" aria-label="Isometric combat arena"></canvas>
   <div class="hud" id="hpbox"><div id="hpname"><span id="hpl">Cinder, dummy</span><span id="hpn"></span></div><div id="hpbar" style="position:relative"><div id="hpghost"></div><div id="hpfill"></div></div></div>
@@ -109,6 +109,8 @@ kbd{font:12px ui-monospace,SFMono-Regular,Menlo,monospace;background:var(--pn);b
     <button id="bJump" data-a="jump">Jump</button>
     <button id="bLight" data-a="light">Light</button>
     <button id="bSpec" data-a="special">Launch</button>
+    <button id="bDash" data-a="dash">Dash</button>
+    <button id="bGuard" data-a="guard">Guard</button>
   </div>
 </div>
 
@@ -130,7 +132,7 @@ kbd{font:12px ui-monospace,SFMono-Regular,Menlo,monospace;background:var(--pn);b
     <fieldset><legend>Playback</legend><button class="t" data-o="speed" aria-pressed="false">Speed 1×</button><button class="t" data-o="dguard" aria-pressed="false">Dummy blocks</button><button class="t" data-o="demo" aria-pressed="false">Demo combo</button><button class="t" data-o="reset" aria-pressed="false">Reset (R)</button></fieldset>
   </div>
   <h3 class="ch">Controls</h3>
-  <ul class="ctl"><li><kbd>WASD</kbd> or arrows move, relative to the camera</li><li><kbd>Space</kbd> jump</li><li><kbd>J</kbd> light chain, aerial slash in the air</li><li><kbd>K</kbd> launcher, plunge in the air</li><li><kbd>Shift</kbd> dash</li><li>Hold <kbd>L</kbd> to guard</li><li><kbd>Q</kbd> <kbd>E</kbd> rotate the camera</li><li><kbd>T</kbd> slow motion</li><li><kbd>Esc</kbd> closes this screen</li></ul>
+  <ul class="ctl"><li><kbd>WASD</kbd> or arrows move, relative to the camera</li><li><kbd>Space</kbd> jump</li><li><kbd>J</kbd> / <kbd>Z</kbd> / left-click light chain, aerial slash in the air</li><li><kbd>K</kbd> / <kbd>X</kbd> / right-click launcher, plunge in the air</li><li><kbd>Shift</kbd> / <kbd>V</kbd> dash</li><li>Hold <kbd>L</kbd> / <kbd>H</kbd> to guard</li><li><kbd>Q</kbd> <kbd>E</kbd> rotate the camera</li><li><kbd>T</kbd> slow motion</li><li>Touch: stick moves, buttons jump / light / launch / dash / guard</li><li><kbd>Esc</kbd> closes this screen</li></ul>
 </div></div>
 <script>
 const DATA=/*DATA*/null;
@@ -748,9 +750,19 @@ const hash=(i,j)=>{const s=Math.sin(i*127.1+j*311.7)*43758.5453;return s-Math.fl
 function poly(g,pts){g.beginPath();pts.forEach((p,i)=>i?g.lineTo(p[0],p[1]):g.moveTo(p[0],p[1]));g.closePath()}
 function drawBackdrop(){
   const g=sg;
-  const gr=g.createRadialGradient(VW/2,VH*.55,20,VW/2,VH*.55,Math.max(VW,VH)*.75);
-  gr.addColorStop(0,'#222635');gr.addColorStop(1,'#0b0c11');
+  // day-tournament sky
+  const gr=g.createLinearGradient(0,0,0,VH);
+  gr.addColorStop(0,'#1e6cc0');gr.addColorStop(.5,'#57aae6');gr.addColorStop(.75,'#bcdcf2');gr.addColorStop(1,'#e6d3a8');
   g.fillStyle=gr;g.fillRect(0,0,VW,VH);
+  // sun glow
+  const sx=VW*.78,sy=VH*.18,R=Math.max(VW,VH)*.32;
+  const sun=g.createRadialGradient(sx,sy,0,sx,sy,R);
+  sun.addColorStop(0,'rgba(255,252,230,.9)');sun.addColorStop(.25,'rgba(255,246,205,.35)');sun.addColorStop(1,'rgba(255,246,205,0)');
+  g.fillStyle=sun;g.fillRect(0,0,VW,VH);
+  // distant stands silhouette (screen-space: identical from every camera angle)
+  g.fillStyle='rgba(125,138,160,.85)';g.fillRect(0,VH*.6,VW,VH*.09);
+  g.fillStyle='rgba(105,118,142,.9)';g.fillRect(0,VH*.69,VW,VH*.07);
+  g.fillStyle='rgba(234,240,244,.5)';g.fillRect(0,VH*.76,VW,VH*.24);
 }
 function drawFloor(){
   const g=sg,h=N/2;
@@ -762,28 +774,45 @@ function drawFloor(){
     const a=corners[i],b=corners[(i+1)%4];
     const pa=proj(a[0],a[1],0),pb=proj(b[0],b[1],0);
     if((pa[1]+pb[1])/2>cs+3){
-      g.fillStyle=i%2?'#1a1d27':'#151821';
+      g.fillStyle=i%2?'#a09c8e':'#8f8b7d';
       poly(g,[pa,pb,[pb[0],pb[1]+th],[pa[0],pa[1]+th]]);g.fill();
-      g.strokeStyle='#2a2e3c';g.lineWidth=1;g.beginPath();g.moveTo(pa[0],pa[1]+.5);g.lineTo(pb[0],pb[1]+.5);g.stroke();
+      g.strokeStyle='#c9c4b2';g.lineWidth=1;g.beginPath();g.moveTo(pa[0],pa[1]+.5);g.lineTo(pb[0],pb[1]+.5);g.stroke();
     }
   }
   for(let i=0;i<N;i++)for(let j=0;j<N;j++){
     const u0=i-h,v0=j-h;
     const pts=[[u0,v0],[u0+1,v0],[u0+1,v0+1],[u0,v0+1]].map(([u,v])=>{const [x,y]=tileXY(u,v);return proj(x,y,0)});
     const hs=hash(i,j),chk=(i+j)&1;
-    const l=(chk?32:37)+hs*6;
-    g.fillStyle=`rgb(${l+2},${l+4},${l+14})`;
-    poly(g,pts);g.fill();
-    g.strokeStyle='#363a4a';g.lineWidth=1;g.stroke();
-    if(hs>.82){ // chipped tile highlight
-      g.fillStyle='rgba(255,255,255,.04)';poly(g,pts);g.fill();
+    const am=Math.max(Math.abs(u0+.5),Math.abs(v0+.5));
+    let fill,stroke;
+    if(am<=1){
+      // canvas mat: warm worn canvas, darker center band
+      const worn=Math.abs(v0+.5)<=.5?14:0;
+      const l=(chk?198:206)-worn+hs*6;
+      fill=`rgb(${l|0},${(l-8)|0},${(l-38)|0})`;stroke='#8a8468';
+    }else if(am<=2){
+      // border ring: tournament blue
+      const l=(chk?58:68)+hs*8;
+      fill=`rgb(${(l*.72)|0},${(l*.95)|0},${(l*1.55)|0})`;stroke='#2c3a5e';
+    }else{
+      // outer apron: cracked stone
+      const l=(chk?120:133)+hs*7;
+      fill=`rgb(${(l+2)|0},${(l+2)|0},${(l-12)|0})`;stroke='#6b6a5e';
+    }
+    poly(g,pts);g.fillStyle=fill;g.fill();
+    g.strokeStyle=stroke;g.lineWidth=1;g.stroke();
+    if(am>2&&hs>.55){
+      // crack across the stone: edge midpoint to center
+      const cx=(pts[0][0]+pts[2][0])/2,cy=(pts[0][1]+pts[2][1])/2;
+      const e=(hs*4)|0,ex=(pts[e][0]+pts[(e+1)%4][0])/2,ey=(pts[e][1]+pts[(e+1)%4][1])/2;
+      g.strokeStyle='rgba(70,68,58,.55)';g.beginPath();g.moveTo(ex,ey);g.lineTo(cx,cy);g.stroke();
     }
   }
-  // rune circle
+  // ring emblem
   const ringPts=(r,n=72)=>{const o=[];for(let k=0;k<n;k++){const a=k/n*TAU;o.push(proj(Math.cos(a)*r,Math.sin(a)*r,0))}return o};
-  g.strokeStyle='rgba(214,128,72,.42)';g.lineWidth=1;
+  g.strokeStyle='rgba(150,84,24,.6)';g.lineWidth=2;
   poly(g,ringPts(96));g.stroke();
-  g.strokeStyle='rgba(214,128,72,.25)';poly(g,ringPts(70));g.stroke();
+  g.strokeStyle='rgba(150,84,24,.35)';g.lineWidth=1;poly(g,ringPts(70));g.stroke();
   for(let k=0;k<8;k++){const a=k/8*TAU+Math.PI/8;
     const p1=proj(Math.cos(a)*70,Math.sin(a)*70,0),p2=proj(Math.cos(a)*96,Math.sin(a)*96,0);
     g.beginPath();g.moveTo(p1[0],p1[1]);g.lineTo(p2[0],p2[1]);g.stroke()}
@@ -827,6 +856,49 @@ function drawBrazier(b){
   const fl=flick(b);
   r(-4,-32*fl-0,8,6*fl,'#ff7a2a');r(-3,-37*fl,6,8*fl,'#ffb347');r(-1.5,-41*fl,3,6*fl,'#fff0b0');
 }
+/* ---------- arena dressing: ring posts, ropes, crowd, banners (all 8-way symmetric) ---------- */
+const POSTC=4.35;
+const POSTS=[[POSTC,POSTC],[-POSTC,-POSTC],[POSTC,-POSTC],[-POSTC,POSTC]].map(([u,v])=>{const [x,y]=tileXY(u,v);return {x,y}});
+const ROPES=[[0,2],[0,3],[1,2],[1,3]];
+function drawPost(p){
+  const g=sg,[x,y]=proj(p.x,p.y,0),Z=cam.Z,X=Math.round(x),Y=Math.round(y);
+  const H=Math.round(86*Z),Wd=Math.max(2,Math.round(11*Z));
+  g.fillStyle='#4a3220';g.fillRect(Math.round(X-Wd/2),Math.round(Y-H),Wd,H);
+  g.fillStyle='#6b4a2e';g.fillRect(Math.round(X-Wd/2),Math.round(Y-H),Math.max(1,Math.round(Wd*.4)),H);
+  g.fillStyle='#2c3a5e';g.fillRect(Math.round(X-Wd/2-2*Z),Math.round(Y-H-8*Z),Math.round(Wd+4*Z),Math.round(8*Z));
+}
+function drawRope(a,b,z,col){
+  const g=sg;g.strokeStyle=col;g.lineWidth=Math.max(1,Math.round(3*cam.Z));
+  g.beginPath();
+  for(let k=0;k<=10;k++){
+    const t=k/10,sag=Math.sin(t*Math.PI)*-5;
+    const [x,y]=proj(a.x+(b.x-a.x)*t,a.y+(b.y-a.y)*t,z+sag);
+    k?g.lineTo(x,y):g.moveTo(x,y);
+  }
+  g.stroke();
+}
+const AUDV=[1,3,9,12,14,17,18,22];
+const CROWD=[];
+for(let k=0;k<16;k++){const a=k/16*TAU;CROWD.push({x:Math.cos(a)*295,y:Math.sin(a)*295,v:k%AUDV.length,ph:(k*2.39)%TAU})}
+for(let k=0;k<20;k++){const a=(k+.5)/20*TAU;CROWD.push({x:Math.cos(a)*365,y:Math.sin(a)*365,v:(k*3+1)%AUDV.length,ph:(k*1.71)%TAU})}
+function drawCrowd(c){
+  const fr=(Math.floor(tick/28+c.ph)%2)?'b':'a';
+  const img=IMG['arena/aud'+String(AUDV[c.v]).padStart(2,'0')+'_'+fr];if(!img)return;
+  const Z=cam.Z*(1+cam.pk*clamp(depthOf(c.x,c.y)/A,-1,1));
+  const bounce=RM?0:Math.abs(Math.sin(tick*.09+c.ph))*4*Z;
+  const [x,y]=proj(c.x,c.y,0),w=64*Z,h=64*Z;
+  sg.drawImage(img,Math.round(x-w/2),Math.round(y-h-bounce),Math.round(w),Math.round(h));
+}
+const BANP=[[198,198],[-198,-198],[198,-198],[-198,198]];
+function drawBannerPole(p,i){
+  const g=sg,[x,y]=proj(p.x,p.y,0),Z=cam.Z;
+  const H=Math.round(150*Z),Wd=Math.max(2,Math.round(7*Z));
+  g.fillStyle='#3d3f4d';g.fillRect(Math.round(x-Wd/2),Math.round(y-H),Wd,H);
+  const img=IMG['arena/banner'+(i%4)];if(!img)return;
+  const sway=RM?0:Math.sin(tick*.05+i*1.7)*3*Z;
+  const w=Math.round(110*Z),h=Math.round(55*Z);
+  g.drawImage(img,Math.round(x-w/2),Math.round(y-H+sway),w,h);
+}
 function drawFxWorld(){
   const g=sg;
   for(const p of parts){
@@ -839,7 +911,7 @@ function drawFxWorld(){
 }
 function drawLights(){
   const k=Lc.width/VW,g=lg;
-  g.globalCompositeOperation='source-over';g.fillStyle='rgb(112,118,150)';g.fillRect(0,0,Lc.width,Lc.height);
+  g.globalCompositeOperation='source-over';g.fillStyle='rgb(172,176,192)';g.fillRect(0,0,Lc.width,Lc.height);
   g.globalCompositeOperation='lighter';
   const L=(wx,wy,wz,r,c,i,sq=.62,lift=10)=>{
     const [x,y]=proj(wx,wy,wz),R=r*cam.Z*k;
@@ -848,7 +920,7 @@ function drawLights(){
     gr.addColorStop(0,`rgba(${c},${i})`);gr.addColorStop(.5,`rgba(${c},${i*.4})`);gr.addColorStop(1,`rgba(${c},0)`);
     g.fillStyle=gr;g.fillRect(-R,-R,R*2,R*2);g.restore();
   };
-  L(0,0,0,380,'150,165,215',.9,.66,0);
+  L(0,0,0,380,'255,244,220',.55,.66,0);
   for(const b of BRAZ)L(b.x*.97,b.y*.97,22,230,'255,150,70',.9*flick(b),.7,0);
   L(P.x,P.y,P.z*.5,92,'130,175,255',.38,.7,16);
   L(E.x,E.y,E.z*.5,86,'255,140,80',.3,.7,16);
@@ -948,6 +1020,11 @@ function render(){
     {d:depthOf(E.x,E.y),f:()=>drawEnt(E,PB,true)}
   ];
   for(const b of BRAZ)list.push({d:depthOf(b.x,b.y),f:()=>drawBrazier(b)});
+  for(const p of POSTS)list.push({d:depthOf(p.x,p.y),f:()=>drawPost(p)});
+  for(const [ia,ib] of ROPES){const a=POSTS[ia],b=POSTS[ib],mx=(a.x+b.x)/2,my=(a.y+b.y)/2;
+    list.push({d:depthOf(mx,my),f:()=>{drawRope(a,b,64,'#c8483c');drawRope(a,b,46,'#e8e0cc')}})}
+  for(const c of CROWD)list.push({d:depthOf(c.x,c.y),f:()=>drawCrowd(c)});
+  BANP.forEach(([x,y],i)=>list.push({d:depthOf(x,y),f:()=>drawBannerPole({x,y},i)}));
   list.sort((a,b)=>a.d-b.d);list.forEach(o=>o.f());
   drawFxWorld();
   if(opt.light)drawLights();
@@ -1016,12 +1093,12 @@ function frame(now){
 }
 
 /* ---------- input wiring ---------- */
-const ACT={j:'light',k:'special',' ':'jump',shift:'dash'};
+const ACT={j:'light',z:'light',k:'special',x:'special',' ':'jump',shift:'dash',v:'dash'};
 addEventListener('keydown',e=>{
   if(e.metaKey||e.ctrlKey||e.altKey)return;
   const k=e.key.toLowerCase();
   if(UI.open){if(k==='escape'&&UI.open==='set')hideOv();return}
-  if(k==='l'){e.preventDefault();if(!e.repeat){userTouched();keys.add('l');press('guard')}return}
+  if(k==='l'||k==='h'){e.preventDefault();if(!e.repeat){userTouched();keys.add('l');press('guard')}return}
   if(ACT[k]){e.preventDefault();if(!e.repeat){userTouched();press(ACT[k])}return}
   if('wasd'.includes(k)&&k.length===1||k.startsWith('arrow')){e.preventDefault();userTouched();keys.add(k);return}
   if(e.repeat)return;
@@ -1031,11 +1108,19 @@ addEventListener('keydown',e=>{
   else if(k==='f')toggle('debug');
   else if(k==='t')cycleSpeed();
 });
-addEventListener('keyup',e=>{const k=e.key.toLowerCase();keys.delete(k);if(k===' ')e.preventDefault()});
+addEventListener('keyup',e=>{const k=e.key.toLowerCase();keys.delete(k);if(k==='h')keys.delete('l');if(k===' ')e.preventDefault()});
 addEventListener('blur',()=>keys.clear());
 function rotate(d){dir.tw=null;latchNow();cam.target+=45*d;dir.pause=240;dir.grace=60;dir.q=null}
 $('camL').onclick=e=>{rotate(-1);e.currentTarget.blur()};
 $('camR').onclick=e=>{rotate(1);e.currentTarget.blur()};
+/* mouse controls: left-click light, right-click special (same buffered actions as J/K) */
+$('c').addEventListener('mousedown',e=>{
+  if(UI.open)return;
+  if(e.button===0){e.preventDefault();userTouched();press('light')}
+  else if(e.button===2){e.preventDefault();userTouched();press('special')}
+  if(document.activeElement&&document.activeElement.blur)document.activeElement.blur();
+});
+$('stage').addEventListener('contextmenu',e=>e.preventDefault());
 function cycleSpeed(){const i=(SPEEDS.indexOf(opt.speed)+1)%SPEEDS.length;opt.speed=SPEEDS[i];document.querySelector('[data-o=speed]').textContent='Speed '+(opt.speed===1?'1×':opt.speed+'×')}
 function toggle(name){
   opt[name]=!opt[name];
@@ -1071,6 +1156,13 @@ document.querySelectorAll('#btns button').forEach(b=>{
   b.addEventListener('pointerdown',e=>{e.preventDefault();userTouched();press(b.dataset.a);b.classList.add('dn')});
   const up=()=>b.classList.remove('dn');b.addEventListener('pointerup',up);b.addEventListener('pointercancel',up);b.addEventListener('pointerleave',up);
 });
+/* touch guard is hold-to-guard like the L/H keys: track 'l' in the keys set */
+const bGuard=$('bGuard');
+if(bGuard){
+  bGuard.addEventListener('pointerdown',()=>keys.add('l'));
+  const guardUp=()=>keys.delete('l');
+  bGuard.addEventListener('pointerup',guardUp);bGuard.addEventListener('pointercancel',guardUp);bGuard.addEventListener('pointerleave',guardUp);
+}
 /* context label on the special button */
 setInterval(()=>{const ab=document.querySelector('[data-o=autocam]');if(ab)ab.textContent=opt.autocam&&dir.pause>0?'Auto paused '+Math.ceil(dir.pause/60)+'s':'Auto camera (C)'},150);
 setInterval(()=>{const air=P.state==='air'||P.state==='airatk';$('bSpec').firstChild.nodeValue=air?'Plunge':'Launch'},150);
@@ -1084,9 +1176,9 @@ function loadImgs(keys,done){keys=keys.filter(k=>DATA.img[k]&&!IMG[k]);let n=key
   keys.forEach(k=>{const i=new Image();i.onload=()=>{if(--n===0)done()};i.onerror=()=>{$('load').textContent='Could not load '+k};i.src=DATA.img[k];IMG[k]=i})}
 function loadFighters(p1,p2,done){const need=new Set();
   [[p1,ANIM_P1],[p2,ANIM_P2]].forEach(([id,an])=>an.forEach(a=>['','p16/','p38/'].forEach(p=>need.add(`${id}/${p}${a}`))));
-  Object.keys(IMG).forEach(k=>{if(k!=='shadow'&&!BASEIDLE.test(k)&&!need.has(k))delete IMG[k]});
+  Object.keys(IMG).forEach(k=>{if(k!=='shadow'&&!k.startsWith('arena/')&&!BASEIDLE.test(k)&&!need.has(k))delete IMG[k]});
   const L=$('busy');L.classList.add('on');loadImgs([...need],()=>{L.classList.remove('on');done()})}
-loadImgs(Object.keys(DATA.img).filter(k=>k==='shadow'||BASEIDLE.test(k)),boot);
+loadImgs(Object.keys(DATA.img).filter(k=>k==='shadow'||k.startsWith('arena/')||BASEIDLE.test(k)),boot);
 const UI={open:null,slot:1,p1:'bram_holt',p2:'cinder'}, ROLE={Breaker:'#d9894f',Shade:'#9b8bdc',Lance:'#6fbfa8',Beacon:'#dcc66e',Weaver:'#7fb2ea',Warden:'#a9c07a'};
 function showOv(id){UI.open=id;keys.clear();$(id).classList.add('on');document.body.style.overflow='hidden'}
 function hideOv(){if(!UI.open)return;$(UI.open).classList.remove('on');UI.open=null;document.body.style.overflow='';last=performance.now()}
