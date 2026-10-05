@@ -1,0 +1,259 @@
+{
+ "frames": 6,
+ "directions": 8,
+ "total_needed": 251,
+ "total_ok": 251,
+ "characters": [
+  {
+   "id": "ren_calder",
+   "name": "Ren Calder",
+   "role": "Shade",
+   "weapon": "twinblades",
+   "cell": 96,
+   "ground_skills": [
+    "slash",
+    "flurry",
+    "whirl"
+   ],
+   "need": 21,
+   "ok": 21,
+   "missing": [],
+   "pitch_sheets": {
+    "p16": 21,
+    "p38": 21
+   },
+   "in_page": false,
+   "issues": {}
+  },
+  {
+   "id": "sera_quill",
+   "name": "Sera Quill",
+   "role": "Weaver",
+   "weapon": "staff",
+   "cell": 96,
+   "ground_skills": [
+    "cast",
+    "pulse",
+    "sweep"
+   ],
+   "need": 21,
+   "ok": 21,
+   "missing": [],
+   "pitch_sheets": {
+    "p16": 21,
+    "p38": 21
+   },
+   "in_page": false,
+   "issues": {}
+  },
+  {
+   "id": "kade_morr",
+   "name": "Kade Morr",
+   "role": "Shade",
+   "weapon": "dagger",
+   "cell": 96,
+   "ground_skills": [
+    "flurry",
+    "slash",
+    "thrust"
+   ],
+   "need": 21,
+   "ok": 21,
+   "missing": [],
+   "pitch_sheets": {
+    "p16": 21,
+    "p38": 21
+   },
+   "in_page": false,
+   "issues": {}
+  },
+  {
+   "id": "bram_holt",
+   "name": "Bram Holt",
+   "role": "Breaker",
+   "weapon": "maul",
+   "cell": 96,
+   "ground_skills": [
+    "slam",
+    "sweep",
+    "bash"
+   ],
+   "need": 21,
+   "ok": 21,
+   "missing": [],
+   "pitch_sheets": {
+    "p16": 21,
+    "p38": 21
+   },
+   "in_page": false,
+   "issues": {}
+  },
+  {
+   "id": "nyx_lumen",
+   "name": "Nyx Lumen",
+   "role": "Beacon",
+   "weapon": "lantern",
+   "cell": 96,
+   "ground_skills": [
+    "cast",
+    "pulse",
+    "sweep"
+   ],
+   "need": 21,
+   "ok": 21,
+   "missing": [],
+   "pitch_sheets": {
+    "p16": 21,
+    "p38": 21
+   },
+   "in_page": false,
+   "issues": {}
+  },
+  {
+   "id": "orin_vale",
+   "name": "Orin Vale",
+   "role": "Lance",
+   "weapon": "spear",
+   "cell": 96,
+   "ground_skills": [
+    "thrust",
+    "sweep",
+    "whirl"
+   ],
+   "need": 21,
+   "ok": 21,
+   "missing": [],
+   "pitch_sheets": {
+    "p16": 21,
+    "p38": 21
+   },
+   "in_page": false,
+   "issues": {}
+  },
+  {
+   "id": "mairen_solas",
+   "name": "Mairen Solas",
+   "role": "Warden",
+   "weapon": "staff",
+   "cell": 96,
+   "ground_skills": [
+    "cast",
+    "pulse",
+    "sweep"
+   ],
+   "need": 21,
+   "ok": 21,
+   "missing": [],
+   "pitch_sheets": {
+    "p16": 21,
+    "p38": 21
+   },
+   "in_page": false,
+   "issues": {}
+  },
+  {
+   "id": "irix_venn",
+   "name": "Irix Venn",
+   "role": "Lance",
+   "weapon": "saber",
+   "cell": 96,
+   "ground_skills": [
+    "thrust",
+    "slash",
+    "flurry"
+   ],
+   "need": 21,
+   "ok": 21,
+   "missing": [],
+   "pitch_sheets": {
+    "p16": 21,
+    "p38": 21
+   },
+   "in_page": false,
+   "issues": {}
+  },
+  {
+   "id": "juno_rake",
+   "name": "Juno Rake",
+   "role": "Weaver",
+   "weapon": "staff",
+   "cell": 96,
+   "ground_skills": [
+    "cast",
+    "pulse",
+    "sweep"
+   ],
+   "need": 21,
+   "ok": 21,
+   "missing": [],
+   "pitch_sheets": {
+    "p16": 21,
+    "p38": 21
+   },
+   "in_page": false,
+   "issues": {}
+  },
+  {
+   "id": "cinder",
+   "name": "Cinder",
+   "role": "Shade",
+   "weapon": "longsword",
+   "cell": 96,
+   "ground_skills": [
+    "slash",
+    "thrust",
+    "whirl"
+   ],
+   "need": 21,
+   "ok": 21,
+   "missing": [],
+   "pitch_sheets": {
+    "p16": 21,
+    "p38": 21
+   },
+   "in_page": false,
+   "issues": {}
+  },
+  {
+   "id": "the_carapace",
+   "name": "The Carapace",
+   "role": "Breaker",
+   "weapon": "gauntlets",
+   "cell": 128,
+   "ground_skills": [
+    "flurry",
+    "slam",
+    "sweep"
+   ],
+   "need": 21,
+   "ok": 21,
+   "missing": [],
+   "pitch_sheets": {
+    "p16": 21,
+    "p38": 21
+   },
+   "in_page": false,
+   "issues": {}
+  },
+  {
+   "id": "floor_voice",
+   "name": "Floor Voice",
+   "role": "Beacon",
+   "weapon": "tablet",
+   "cell": 96,
+   "ground_skills": [
+    "cast",
+    "pulse"
+   ],
+   "need": 20,
+   "ok": 20,
+   "missing": [],
+   "pitch_sheets": {
+    "p16": 20,
+    "p38": 20
+   },
+   "in_page": false,
+   "issues": {}
+  }
+ ]
+}

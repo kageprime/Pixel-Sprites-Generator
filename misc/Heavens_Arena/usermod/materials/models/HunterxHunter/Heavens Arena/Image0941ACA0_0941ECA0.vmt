@@ -1,0 +1,13 @@
+"VertexlitGeneric"
+{
+   "$basetexture" "models\HunterxHunter\Heavens Arena/Image0941ACA0_0941ECA0"
+	"$bumpmap" "models\HunterxHunter\Heavens Arena\map"
+	"$lightwarptexture" "models\HunterxHunter\Heavens Arena\lightwrap"
+	"$alphatest" "1"
+	"$phong" "1"
+	"$phongboost" "1"
+	"$phongexponent" "5"									
+	"$phongfresnelranges"	"[0 0.5  1]"
+	"$halflambert" 1
+	"$nocull" 1
+}
