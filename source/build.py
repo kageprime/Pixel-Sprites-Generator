@@ -26,7 +26,31 @@ vd='../veilspire_iso/vfx'
 if os.path.isdir(vd):
     for p in sorted(glob.glob(f'{vd}/*.png')):
         img['vfx/'+os.path.splitext(os.path.basename(p))[0]]=b64(p)
-src=open('combat.src.html').read()
+import shutil
+src_combat=open('combat.src.html').read()
 os.makedirs('out',exist_ok=True)
-open('out/combat.html','w').write(src.replace('/*DATA*/null',json.dumps({'M':M,'img':img},separators=(',',':'))))
-print(len(os.path.getsize('out/combat.html').__str__()),os.path.getsize('out/combat.html')//1024,'KB')
+payload_combat=json.dumps({'M':M,'img':img},separators=(',',':'))
+open('out/combat.html','w').write(src_combat.replace('/*DATA*/null',payload_combat))
+print('combat',os.path.getsize('out/combat.html')//1024,'KB')
+shutil.copyfile('out/combat.html','../combat.html')
+# hollow level art: cursed ground sheet, undead/city props, swordwarrior foe sheets
+td='art/tiles'
+if os.path.isdir(td):
+    for p in sorted(glob.glob(f'{td}/*.png')):
+        img['tile/'+os.path.splitext(os.path.basename(p))[0]]=b64(p)
+pd='art/props'
+if os.path.isdir(pd):
+    for p in sorted(glob.glob(f'{pd}/*.png')):
+        img['prop/'+os.path.splitext(os.path.basename(p))[0]]=b64(p)
+fd='art/foes'
+if os.path.isdir(fd):
+    for p in sorted(glob.glob(f'{fd}/*.png')):
+        img['foe/'+os.path.splitext(os.path.basename(p))[0]]=b64(p)
+try:
+    src_hollow=open('hollow.src.html').read()
+    payload_hollow=json.dumps({'M':M,'img':img},separators=(',',':'))
+    open('out/hollow.html','w').write(src_hollow.replace('/*DATA*/null',payload_hollow))
+    print('hollow',os.path.getsize('out/hollow.html')//1024,'KB')
+    shutil.copyfile('out/hollow.html','../hollow.html')
+except FileNotFoundError:
+    pass
