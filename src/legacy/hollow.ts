@@ -9,6 +9,7 @@ import { setCamMatrix as setCamMatrixBase, proj as projBase, depthOf as depthOfB
 import { createHollow } from '../sim/hollow';
 import { createHollowRenderer, PROP_LIST } from '../render/hollow';
 import { createSpriteLoader } from '../engine/sprites';
+import { createOverlay, bindStick, bindActionButtons, bindCamButtons, bindCanvasButtons, bindKeyRelease, bindMuteButtons } from '../ui/shell';
 (()=>{
 'use strict';
 /* ================= Hollow I: Cinder Hall — iso rebuild of the prototype ================
@@ -48,9 +49,8 @@ const rowOf=face=>rowOfBase(HS.cam,face);
 /* ---------- shell ---------- */
 const ROLE={Breaker:'#d9894f',Shade:'#9b8bdc',Lance:'#6fbfa8',Beacon:'#dcc66e',Weaver:'#7fb2ea',Warden:'#a9c07a'};
 let introIl=0,introTi=0,introIv=0,hov=null;
-function showOv(id){if(UI.open)$(UI.open).classList.remove('on');UI.open=id;keys.clear();$(id).classList.add('on');document.body.style.overflow='hidden'}
-function hideOv(){if(!UI.open)return;$(UI.open).classList.remove('on');UI.open=null;document.body.style.overflow='';last=performance.now()}
-function goOv(id){hideOv();showOv(id)}
+const OVF=createOverlay(UI,keys,{onResume:()=>{last=performance.now()}});
+const showOv=OVF.show, hideOv=OVF.hide, goOv=OVF.go;
 function paintCreate(){const c=CHR[UI.p1];if(!c)return;
   const el=document.querySelector('.slot.s1');
   el.querySelector('.sn').textContent=c.name;
@@ -103,13 +103,12 @@ function initUI(){const ros=$('roster');
   $('mCreate').onclick=()=>{snd(440,.06);createReturn='title';paintCreate();showOv('create')};
   $('mHow').onclick=()=>{snd(660,.05);howReturn='title';showOv('how')};
   $('mCred').onclick=()=>{snd(660,.05);showOv('credits')};
-  $('mMute').onclick=()=>{toggleMute();snd(660,.05)};
+  bindMuteButtons();
   $('mPractice').onclick=()=>{location.href='combat.html?arena=day'};
   $('howBack').onclick=()=>{snd(440,.05);if(howReturn==='run')hideOv();else goOv(howReturn||'title')};
   $('credBack').onclick=()=>{snd(440,.05);goOv('title')};
   $('pResume').onclick=()=>{snd(440,.05);hideOv()};
   $('pQuit').onclick=()=>{snd(330,.1);HS.reset();goOv('title')};
-  $('pMute').onclick=()=>{toggleMute();snd(660,.05)};
   $('deadGo').onclick=()=>{HS.reset();hideOv();snd(440,.08)};
   $('deadTitle').onclick=()=>{HS.reset();goOv('title')};
   $('endGo').onclick=()=>{HS.reset();hideOv();snd(440,.08)};
@@ -141,37 +140,13 @@ addEventListener('keydown',e=>{if(e.metaKey||e.ctrlKey||e.altKey)return;const k=
   if(k==='q')HS.rotate(-1);
   else if(k==='m')toggleMute();
   else if(k==='r'&&(HS.dead||HS.won)){HS.reset();hideOv()}});
-addEventListener('keyup',e=>{const k=e.key.toLowerCase();keys.delete(k);if(k==='h')keys.delete('l');if(k===' ')e.preventDefault()});
-addEventListener('blur',()=>keys.clear());
-$('camL').onclick=e=>{HS.rotate(-1);e.currentTarget.blur()};
-$('camR').onclick=e=>{HS.rotate(1);e.currentTarget.blur()};
-$('c').addEventListener('mousedown',e=>{if(UI.open)return;
-  if(e.button===0){e.preventDefault();HS.press('light')}else if(e.button===2){e.preventDefault();HS.press('special')}});
-$('stage').addEventListener('contextmenu',e=>e.preventDefault());
+bindKeyRelease(keys);
+bindCamButtons(d=>HS.rotate(d));
+bindCanvasButtons({UI,press:(a)=>HS.press(a)});
 $('stage').addEventListener('click',e=>{if(UI.open)return});
-const touchBar=$('touch');
-function showTouch(){touchBar.classList.add('show');document.body.classList.add('gb');fit()}
-if(matchMedia('(pointer:coarse)').matches)showTouch();
-addEventListener('touchstart',showTouch,{once:true,passive:true});
-const stick=$('stick'),knob=$('knob');let stickId=null;
-function stickMove(e){const r=stick.getBoundingClientRect(),cx=r.left+r.width/2,cy=r.top+r.height/2;
-  let dx=(e.clientX-cx)/(r.width/2),dy=(e.clientY-cy)/(r.height/2);const m=Math.hypot(dx,dy);
-  if(m>1){dx/=m;dy/=m}touchMove.x=Math.abs(dx)<.15?0:dx;touchMove.y=Math.abs(dy)<.15?0:dy;
-  knob.style.transform='translate('+(dx*36)+'px,'+(dy*36)+'px)'}
-stick.addEventListener('pointerdown',e=>{stickId=e.pointerId;stick.setPointerCapture(e.pointerId);stickMove(e)});
-stick.addEventListener('pointermove',e=>{if(e.pointerId===stickId)stickMove(e)});
-const stickEnd=e=>{if(e.pointerId===stickId){stickId=null;touchMove.x=0;touchMove.y=0;knob.style.transform=''}};
-stick.addEventListener('pointerup',stickEnd);stick.addEventListener('pointercancel',stickEnd);
-document.querySelectorAll('#btns button[data-a]').forEach(b=>{
-  b.addEventListener('pointerdown',e=>{e.preventDefault();if(UI.open)return;HS.press(b.dataset.a);b.classList.add('dn')});
-  const up=()=>b.classList.remove('dn');b.addEventListener('pointerup',up);b.addEventListener('pointercancel',up);b.addEventListener('pointerleave',up)});
-const bPause=$('bPause');
-if(bPause)bPause.addEventListener('pointerdown',e=>{e.preventDefault();if(!UI.open)showOv('pause')});
-/* touch guard is hold-to-guard like the L/H keys */
-const bGuard=document.querySelector('#btns button[data-a="guard"]');
-if(bGuard){bGuard.addEventListener('pointerdown',()=>keys.add('l'));
-  const guardUp=()=>keys.delete('l');
-  bGuard.addEventListener('pointerup',guardUp);bGuard.addEventListener('pointercancel',guardUp);bGuard.addEventListener('pointerleave',guardUp)}
+bindStick({touchMove,onShow:()=>fit()});
+/* touch guard is hold-to-guard like the L/H keys: shared bindActionButtons tracks 'l' */
+bindActionButtons({UI,keys,press:(a)=>HS.press(a),onPause:()=>showOv('pause')});
 addEventListener('resize',()=>fit());
 /* camera keys: Q rotate left, C rotate right (E is use) */
 let howReturn='title';

@@ -10,6 +10,7 @@ import { REDUCED_MOTION as RM } from '../engine/env';
 import { createDuel, ARENA_A } from '../sim/duel';
 import { createDuelRenderer, setArena, getArenaId } from '../render/duel';
 import { createSpriteLoader } from '../engine/sprites';
+import { createOverlay, bindStick, bindActionButtons, bindCamButtons, bindCanvasButtons, bindKeyRelease, bindMuteButtons } from '../ui/shell';
 (()=>{
 'use strict';
 const M=DATA.M, IMG={};
@@ -48,6 +49,8 @@ const opt={dof:true,light:true,shake:true,push:true,debug:false,speed:1,autocam:
 const DEBUG=new URLSearchParams(location.search).get('debug')==='1';   // dev tools (frame data, demo, reset, speed) only surface with ?debug=1
 try{const sv=localStorage.getItem('vs_autocam');if(sv!==null)opt.autocam=sv==='1';else if(RM)opt.autocam=false}catch(e){if(RM)opt.autocam=false}
 const SPEEDS=[1,.5,.25];
+/* UI is declared here because input-wiring helpers receive it before boot. */
+const UI={open:null,slot:1,p1:'bram_holt',p2:'cinder',arena:'day',s1:'pixel',s2:'pixel'}, ROLE={Breaker:'#d9894f',Shade:'#9b8bdc',Lance:'#6fbfa8',Beacon:'#dcc66e',Weaver:'#7fb2ea',Warden:'#a9c07a'};
 /* input state + duel sim: shared sim/duel (see factory) */
 const DS=createDuel({IMG,opt,getPA:()=>PA,getView:()=>({baseZoom,vw:VW}),project:(x,y,z)=>proj(x,y,z),onResult:()=>showResult()});
 const P=DS.P, E=DS.E, combo=DS.combo, cam=DS.cam, dir=DS.dir, bot=DS.bot, dbg=DS.dbg;
@@ -117,18 +120,10 @@ addEventListener('keydown',e=>{
   else if(k==='b')cycleP1Skin();
   else if(k==='m')toggleMute();
 });
-addEventListener('keyup',e=>{const k=e.key.toLowerCase();keys.delete(k);if(k==='h')keys.delete('l');if(k===' ')e.preventDefault()});
-addEventListener('blur',()=>keys.clear());
-$('camL').onclick=e=>{DS.rotate(-1);e.currentTarget.blur()};
-$('camR').onclick=e=>{DS.rotate(1);e.currentTarget.blur()};
+bindKeyRelease(keys);
+bindCamButtons(d=>DS.rotate(d));
 /* mouse controls: left-click light, right-click special (same buffered actions as J/K) */
-$('c').addEventListener('mousedown',e=>{
-  if(UI.open)return;
-  if(e.button===0){e.preventDefault();DS.userTouched();DS.press('light')}
-  else if(e.button===2){e.preventDefault();DS.userTouched();DS.press('special')}
-  if(document.activeElement&&document.activeElement.blur)document.activeElement.blur();
-});
-$('stage').addEventListener('contextmenu',e=>e.preventDefault());
+bindCanvasButtons({UI,press:(a)=>{DS.userTouched();DS.press(a)},blurFocus:true});
 function cycleSpeed(){const i=(SPEEDS.indexOf(opt.speed)+1)%SPEEDS.length;opt.speed=SPEEDS[i];document.querySelector('[data-o=speed]').textContent='Speed '+(opt.speed===1?'1×':opt.speed+'×')}
 function toggle(name){
   opt[name]=!opt[name];
@@ -143,36 +138,9 @@ document.querySelectorAll('#opts [data-o]').forEach(b=>b.addEventListener('click
   else toggle(o);
   b.blur();
 }));
-/* touch controls */
-const touchBar=$('touch');
-function showTouch(){touchBar.classList.add('show');document.body.classList.add('gb');fit()}
-if(matchMedia('(pointer:coarse)').matches)showTouch();
-addEventListener('touchstart',showTouch,{once:true,passive:true});
-const stick=$('stick'),knob=$('knob');let stickId=null;
-function stickMove(e){
-  const r=stick.getBoundingClientRect(),cx=r.left+r.width/2,cy=r.top+r.height/2;
-  let dx=(e.clientX-cx)/(r.width/2),dy=(e.clientY-cy)/(r.height/2);const m=Math.hypot(dx,dy);
-  if(m>1){dx/=m;dy/=m}
-  touchMove.x=Math.abs(dx)<.15?0:dx;touchMove.y=Math.abs(dy)<.15?0:dy;
-  knob.style.transform=`translate(${dx*36}px,${dy*36}px)`;
-}
-stick.addEventListener('pointerdown',e=>{stickId=e.pointerId;stick.setPointerCapture(e.pointerId);DS.userTouched();stickMove(e)});
-stick.addEventListener('pointermove',e=>{if(e.pointerId===stickId)stickMove(e)});
-const stickEnd=e=>{if(e.pointerId===stickId){stickId=null;touchMove.x=0;touchMove.y=0;knob.style.transform=''}};
-stick.addEventListener('pointerup',stickEnd);stick.addEventListener('pointercancel',stickEnd);
-document.querySelectorAll('#btns button[data-a]').forEach(b=>{
-  b.addEventListener('pointerdown',e=>{e.preventDefault();if(UI.open)return;DS.userTouched();DS.press(b.dataset.a);b.classList.add('dn')});
-  const up=()=>b.classList.remove('dn');b.addEventListener('pointerup',up);b.addEventListener('pointercancel',up);b.addEventListener('pointerleave',up);
-});
-const bPause=$('bPause');
-if(bPause){bPause.addEventListener('pointerdown',e=>{e.preventDefault();if(!UI.open)showOv('pause')})}
-/* touch guard is hold-to-guard like the L/H keys: track 'l' in the keys set */
-const bGuard=$('bGuard');
-if(bGuard){
-  bGuard.addEventListener('pointerdown',()=>keys.add('l'));
-  const guardUp=()=>keys.delete('l');
-  bGuard.addEventListener('pointerup',guardUp);bGuard.addEventListener('pointercancel',guardUp);bGuard.addEventListener('pointerleave',guardUp);
-}
+/* touch controls: stick, action buttons (guard is hold-to-guard) */
+bindStick({touchMove,onDown:()=>DS.userTouched(),onShow:()=>fit()});
+bindActionButtons({UI,keys,press:(a)=>DS.press(a),onPress:()=>DS.userTouched(),onPause:()=>showOv('pause')});
 /* context label on the special button */
 setInterval(()=>{const ab=document.querySelector('[data-o=autocam]');if(ab)ab.textContent=opt.autocam&&dir.pause>0?'Auto paused '+Math.ceil(dir.pause/60)+'s':'Auto camera (C)'},150);
 setInterval(()=>{const air=P.state==='air'||P.state==='airatk';$('bSpec').lastChild.textContent=air?'Plunge':'Launch'},150);
@@ -193,7 +161,6 @@ the_carapace:['A Hollow that learned to stand.','The floor reclaims its own.'],
 floor_voice:['It sets the test. It is not allied.','The test is met. The Hollow opens.']};
 addEventListener('pointerdown',()=>resumeAudio());
 
-function goOv(id){hideOv();showOv(id)}
 function openPick(returnTo){pickReturn=returnTo||'title';paintSlot(1);paintSkin();goOv('sel')}
 function closePick(){const b=$('fight');b.disabled=true;snd(440,.08);applyPick(()=>{b.disabled=false;hideOv()})}
 function cancelPick(){if(pickReturn==='run')hideOv();else goOv(pickReturn||'title')}
@@ -228,7 +195,6 @@ function loadFighters(p1,s1,p2,s2,done,quiet){
     loadToons(needTx,()=>{if(!quiet)busyOff();paintCards();done()},quiet)});
 }
 loadImgs(Object.keys(DATA.img).filter(k=>k==='shadow'||k.startsWith('arena/')||k.startsWith('vfx/')||BASEIDLE.test(k)),boot);
-const UI={open:null,slot:1,p1:'bram_holt',p2:'cinder',arena:'day',s1:'pixel',s2:'pixel'}, ROLE={Breaker:'#d9894f',Shade:'#9b8bdc',Lance:'#6fbfa8',Beacon:'#dcc66e',Weaver:'#7fb2ea',Warden:'#a9c07a'};
 /* duel renderer: UI/skins/canvases all exist from here on */
 const DR=createDuelRenderer({IMG,UI,opt,getPA:()=>PA,getPB:()=>PB,getSKP:()=>[SKP1,SKP2],
   gfx:()=>({sg,cg,S,Lc,lg,Q2,q2g,Q4,q4g,Q8,q8g,B1,b1g,B2,b2g,VW,VH,baseZoom})});
@@ -237,9 +203,8 @@ function paintArena(){document.querySelectorAll('.acard[data-arena]').forEach(k=
 function paintSkin(){document.querySelectorAll('.slot.s1 .skinname').forEach(lab=>{lab.textContent=SKINS[UI.s1].label})}
 function paintCur(){}
 const OVFOCUS={title:'mFight',sel:'fight',how:'howBack',credits:'credBack',result:'resGo',pause:'pResume',set:'setX'};
-function showOv(id){if(UI.open)$(UI.open).classList.remove('on');UI.open=id;keys.clear();$(id).classList.add('on');document.body.style.overflow='hidden';
-  const f=OVFOCUS[id]&&$(OVFOCUS[id]);if(f)try{f.focus({preventScroll:true})}catch(e){}}
-function hideOv(){if(!UI.open)return;$(UI.open).classList.remove('on');UI.open=null;document.body.style.overflow='';last=performance.now()}
+const OVF=createOverlay(UI,keys,{focus:OVFOCUS,onResume:()=>{last=performance.now()}});
+const showOv=OVF.show, hideOv=OVF.hide, goOv=OVF.go;
 function paintSlot(){const c=CHR[UI.p1],el=document.querySelector('.slot.s1');if(!el||!c)return;
   el.querySelector('.sn').textContent=c.name;el.querySelector('.st').textContent=`${c.title||''} · ${c.role}, ${c.weapon}`.replace(/^ · /,'');
   document.querySelectorAll('.card').forEach(k=>{k.classList.toggle('p1',k.dataset.id===UI.p1);k.classList.remove('p2')})}
@@ -261,12 +226,11 @@ function initUI(){
   $('mPick').onclick=()=>{snd(440,.06);openPick('title')};
   $('mHow').onclick=()=>{snd(660,.05);goOv('how')};
   $('mCred').onclick=()=>{snd(660,.05);goOv('credits')};
-  $('mMute').onclick=()=>{toggleMute();snd(660,.05)};
+  bindMuteButtons();
   $('howBack').onclick=()=>{snd(440,.05);goOv('title')};
   $('credBack').onclick=()=>{snd(440,.05);goOv('title')};
   $('pResume').onclick=()=>{snd(440,.05);hideOv()};
   $('pQuit').onclick=()=>{snd(330,.1);DS.resetAll();goOv('title')};
-  $('pMute').onclick=()=>{toggleMute();snd(660,.05)};
   $('resGo').onclick=()=>rematch();
   $('resSel').onclick=()=>{snd(440,.05);openPick('result')};
   $('openPause').onclick=e=>{if(!UI.open)showOv('pause');e.currentTarget.blur()};
